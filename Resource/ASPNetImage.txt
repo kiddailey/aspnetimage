@@ -1,0 +1,170 @@
+
+====================================================================
+ASPNetImage v0.1
+
+A COM Interop Wrapper for .NET System.Drawing meant as a drop-in 
+replacement for the third-party ASPImage 2.x component by ServerObjects Inc.
+
+ASPNetImage Copyright 2010 John Dailey
+kiddailey at hotmail dot com
+Distributed under the GNU GENERAL PUBLIC LICENSE v3
+See the enclosed gpl-3.0.txt for more information.
+
+ASPImage Copyright ServerObjects Inc.
+--------------------------------------------------------------------
+
+While attemting to perform a web server update to Windows Server 2008 for a 
+classic ASP app, I discovered that the long-used ASPImage 2.x COM object no 
+longer functions, exiting with a memory error.  
+
+Research into the issue for a solution unearthed a handful of reports from 
+people experiencing the same issue and no luck with customer support or 
+locating an inexpensive, drop-in alternative.
+
+Thus this replacement was born :)
+
+The ASPNetImage component essentially exposes the System.Drawing namespace to 
+classic ASP via an interop COM object using the interface outlined by 
+ServerObjects' ASPImage 2.x component.
+
+For that reason, the web server that you are installing this onto needs to have
+the .NET framework (2.0 or greater) installed.
+
+
+Implementation Details
+====================================================================
+
+It is a work in progress and any help completing the object is appreciated. All 
+properties and methods are stubbed out, but as of this writing, currently only a
+small subset of properties and methods are implemented either in part or whole.
+
+
+Fully Implemented
+--------------------------------------------------------------------
+
+	Properties:
+
+		AutoClear
+		Expires (always returns future date)
+		Filename
+		JPEGQuality
+		RegisteredTo (returns "This Organization" by default, but can be set to any string)
+		Version (returns last known ASPImage version with "(ASPNetImage)" appended)
+
+	Methods:
+
+		BrightenImage
+		CropImage
+		DarkenImage
+		FlipImage
+		GetImageFileSize
+		LoadImage
+		Resize
+		
+	
+Partially Implemented
+--------------------------------------------------------------------
+
+	Properties:
+
+		Error
+		Returns the error from LoadImage and SaveImage methods only.
+		
+		ImageFormat
+		Only JPEG format is supported
+		
+	Methods:
+		
+		ResizeR
+		Calls the Resize method.
+		
+		RotateImage
+		Only rotates at 90, 180 and 270 degrees clockwise
+		
+		SaveImage
+		Saves the image, but currently only in JPEG format.
+		
+		
+Additional Properties And Methods
+--------------------------------------------------------------------
+
+	ConstrainResize
+	When set to true, automatically crops the image during a resize to
+	fit the dimensions and retain the original image's aspect ratio
+	
+	GetImageSize
+	Returns the image dimensions for the currently loaded image
+
+
+
+Deployment
+====================================================================
+
+To deploy the DLL as a replacement, simply perform the following steps:
+
+1. Copy the DLL to the server in a location where it will reside,
+ie. c:\Windows\System32
+
+2. Register the DLL with the server using the .NET register utility
+RegAsm.exe.  This utility is located in the .NET framework folder.
+You must specify the /tlb and /codebase parameters.  See the enclosed
+"register.bat" file for an example.
+
+3. Replace all "ASPImage.Image" references in your ASP files with 
+"ASPNetImage.NetImage"  For example:
+
+	Set imageObj = Server.CreateObject("ASPImage.Image")
+
+becomes:
+
+	Set imageObj = Server.CreateObject("ASPNetImage.NetImage")
+	
+4. Test your ASP application
+
+
+
+Additional notes:
+--------------------------------------------------------------------
+
+As noted, the .NET framework 2.0 or greater is required.
+
+Permissions may need to be adjusted on paths where you save your images.
+The "IUSR_<MachineName>", "Authenticated Users", "ASPNET" and "NETWORK SERVICE"
+are all potential accounts that need write access depending on your setup.
+
+If you intend to compile the DLL yourself, you'll need to create your
+own signing key and assign it to project prior to compiling or you will see 
+a warning message when you register your custom compiled DLL.  Visual Studio
+2005 and up can do this automatically from the Project Properties panel on
+the "Signing" tab.  Just pick "< New >" and follow the prompts.
+
+
+
+Sample VBScript
+====================================================================
+
+Set imageObj = Server.CreateObject("ASPNetImage.NetImage")
+
+Sample code
+<%
+
+	If (imageObj.LoadImage("c:\temp\sampleImage.jpg"))
+	
+		imageObj.Resize 800, 600
+		
+		' ImageFormats
+		'	1 = JPEG
+		'	Other formats to come
+		imageObj.ImageFormat = 1
+		imageObjZoom.JPEGQuality = 95
+		imageObj.Filename = "c:\temp\sampleImage_Resized.jpg"
+		
+		If (Not imageObj.SaveImage())
+			Response.Write("Error saving image: " & imageObj.Error)
+		End If
+		
+	Else
+		Response.Write("Error loading image: " & imageObj.Error)
+	End If
+	
+%>
