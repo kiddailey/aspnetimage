@@ -6,8 +6,17 @@ using System.IO;
 namespace ASPNetImage
 {
     /// <summary>
+    /// ASPNetImage
+    /// 
     /// A COM Interop Wrapper for .NET System.Drawing meant as a drop-in replacement 
     /// for the third-party ASPImage 2.x component by ServerObjects Inc.
+    /// 
+    /// ASPNetImage Copyright 2010 John Dailey
+    /// kiddailey at hotmail dot com
+    /// Distributed under the GNU GENERAL PUBLIC LICENSE v3
+    /// See the enclosed gpl-3.0.txt for more information.
+    ///
+    /// ASPImage Copyright ServerObjects Inc.
     /// </summary>
     public class NetImage
     {
