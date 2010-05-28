@@ -47,7 +47,6 @@
     <None Include="Resource\unregister.bat" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resource\AASPImage 2.x Documentation.html" />
     <Content Include="Resource\ASPNetImage.txt" />
     <Content Include="Resource\gpl-3.0.txt" />
   </ItemGroup>
