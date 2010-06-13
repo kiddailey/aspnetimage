@@ -1,0 +1,43 @@
+#summary One-sentence summary of this page.
+
+= Properties =
+
+ * *AutoClear*:boolean<br />If true, class will automatically dispose image data when the SaveImage method is called.  Default is true.
+  
+ * *ConstrainResize*:boolean<br />When set to true, automatically crops the image during a resize to fit the dimensions and retain the original image's aspect ratio.  Default is true.
+
+  * *Expires*:DateTime<br />Returns the date that the component expires. Included for compatibility. Always returns future date
+
+  * *Error*:string<br />Returns the last error from LoadImage and SaveImage methods only.
+
+  * *Filename*:string<br />Gets or sets the full path and filename to be used by the SaveImage method
+
+  * *ImageFormat*:int<br />Gets or sets the image format to be used by the SaveImage method.  Currently only JPEG format is supported for output.  Enumerated.  See ASPNetImage.ImageFormats.
+
+  * *JPEGQuality*:int<br />Gets or sets the output quality percentage of JPEG images when SaveImage is called to save a JPEG. Valid amounts are 1 to 100.
+
+  * *RegisteredTo*:string<br />Gets or sets the name that the component is registered to.  Included for compatibility. Returns "This Organization" by default, but can be set to any string
+
+= Methods =
+
+  * *BrightenImage*<br />Increases the brightness of the image
+
+  * *CropImage*<br />Crops the image
+
+  * *DarkenImage*<br />Darkens the image
+
+  * *FlipImage*<br />Flips the image>
+
+  * *GetImageFileSize*<br />Returns the image dimensions for the image specified by full file path and name. Currently incurs memory hit as image has to be loaded to determine dimensions.
+
+  * *GetImageSize*<br />Returns the image dimensions for the currently loaded image
+
+  * *LoadImage*<br />Loads an image from disk at the specified filepath
+
+  * *Resize*<br />Resizes the image
+
+  * *ResizeR*<br />Calls the Resize method.
+
+  * *RotateImage*<br />Rotates the image.  Currently only rotates at 90, 180 and 270 degrees clockwise
+
+  * *SaveImage*<br />Saves the image, but currently only in JPEG format.
