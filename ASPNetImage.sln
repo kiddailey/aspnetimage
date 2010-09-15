@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPNetImage", "ASPNetImage.csproj", "{B56B76E7-0BF9-4439-8AEB-91C6709628C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPNetImage", "ASPNetImage\ASPNetImage.csproj", "{B56B76E7-0BF9-4439-8AEB-91C6709628C5}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "..\ConsoleApplication1\UnitTests.csproj", "{E16062BA-6FF9-4C83-BA86-38513658682E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{EFB48FB4-4982-49E4-A007-98BFCE885C70}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
@@ -23,10 +23,10 @@ Global
 		{B56B76E7-0BF9-4439-8AEB-91C6709628C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B56B76E7-0BF9-4439-8AEB-91C6709628C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B56B76E7-0BF9-4439-8AEB-91C6709628C5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E16062BA-6FF9-4C83-BA86-38513658682E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E16062BA-6FF9-4C83-BA86-38513658682E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E16062BA-6FF9-4C83-BA86-38513658682E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E16062BA-6FF9-4C83-BA86-38513658682E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFB48FB4-4982-49E4-A007-98BFCE885C70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFB48FB4-4982-49E4-A007-98BFCE885C70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFB48FB4-4982-49E4-A007-98BFCE885C70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFB48FB4-4982-49E4-A007-98BFCE885C70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
