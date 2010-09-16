@@ -105,7 +105,8 @@ Deployment
 
 To deploy the DLL as a replacement, simply perform the following steps:
 
-1. Copy the DLL to the server in a location where it will reside,
+1. Copy ASPNetImage.dll (located in the ASPNetImage/bin/Release folder) 
+to the server in a location where it will reside, 
 ie. c:\Windows\System32
 
 2. Register the DLL with the server using the .NET register utility
@@ -123,6 +124,29 @@ becomes:
 	Set imageObj = Server.CreateObject("ASPNetImage.NetImage")
 	
 4. Test your ASP application
+
+
+
+Upgrading
+====================================================================
+
+To upgrade your copy of ASPNetImage:
+
+1. Unregister your existing DLL from its current location using the 
+RegAsm.exe utility.  See the enclosed "unregister.bat" for an example.
+
+2. Remove the old DLL and TLB files.
+
+3. Copy the new ASPNetImage.dll (located in the ASPNetImage/bin/Release 
+folder) to the server in a location where it will reside, 
+ie. c:\Windows\System32
+
+4. Register the DLL with the server using the .NET register utility
+RegAsm.exe.  This utility is located in the .NET framework folder.
+You must specify the /tlb and /codebase parameters.  See the enclosed
+"register.bat" file for an example.
+
+5. Restart IIS
 
 
 
