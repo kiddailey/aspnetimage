@@ -41,13 +41,7 @@ namespace ASPNetImage
         /// </summary>
         ~NetImage()
         {
-            try
-            {
-                this._image.Dispose();
-            }
-            catch
-            {
-            }
+            this._image.Dispose();
             GC.Collect();
         }
 
@@ -340,7 +334,7 @@ namespace ASPNetImage
         {
             get
             {
-                return "2.3.1.0 (ASPNetImage v0.2)";
+                return "2.3.1.0 (ASPNetImage v0.1)";
             }
         }
 
@@ -792,10 +786,10 @@ namespace ASPNetImage
                 if ((newHeight > height) || (newWidth > width))
                 {
                     // Use the center of the image as our basis for cropping
-                    int cropY = (newHeight == height ? 0 : Convert.ToInt32((newHeight - height) / 2));
-                    int cropX = (newWidth == width ? 0 : Convert.ToInt32((newWidth - width) / 2));
+                    int cropY = Convert.ToInt32((newHeight - height) / 2);
+                    int cropX = Convert.ToInt32((newWidth - width) / 2);
 
-                    this.CropImage(cropX, cropY, width, height);
+                    this.CropImage(cropX, cropX, width, height);
                 }
 
                 graphicsDest.Dispose();
