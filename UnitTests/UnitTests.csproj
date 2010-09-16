@@ -5,10 +5,12 @@
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EFB48FB4-4982-49E4-A007-98BFCE885C70}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>UnitTests</RootNamespace>
     <AssemblyName>UnitTests</AssemblyName>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,20 +30,27 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.4.6.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="ASPNetImageTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\1024x768-black.png" />
+    <Content Include="Resources\1024x768-white.png" />
     <Content Include="Resources\1024x768.png" />
     <Content Include="Resources\1440x900.png" />
     <Content Include="Resources\900x1440.png" />
-    <Content Include="Resources\bee-pdphoto.org.jpg" />
-    <Content Include="Resources\skyline-pdphoto.org.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ASPNetImage\ASPNetImage.csproj">
+      <Project>{B56B76E7-0BF9-4439-8AEB-91C6709628C5}</Project>
+      <Name>ASPNetImage</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Output\" />
