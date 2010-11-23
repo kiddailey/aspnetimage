@@ -291,5 +291,37 @@ namespace UnitTests
 
             Assert.That(width == 1024 && height == 768, "Image dimensions do not match");
         }
+
+        [Test]
+        public void TestGIMPImage()
+        {
+            string outputFilePath = "../../Output/gimpimage.jpg";
+
+            ASPNetImage.NetImage thisImage = new NetImage();
+            thisImage.LoadImage("../../Resources/gimpimage.jpg");
+            if (thisImage.Error.Length <= 0)
+            {
+                int width = 0;
+                int height = 0;
+                thisImage.GetImageSize(out width, out height);
+
+                if (width > 0 && height > 0)
+                {
+                    thisImage.Filename = outputFilePath;
+                    thisImage.SaveImage();
+                    if (thisImage.Error.Length <= 0)
+                    {
+                        System.IO.FileInfo fileInfo = new System.IO.FileInfo(outputFilePath);
+                        Assert.That(fileInfo.Length > 0, "Image filesize is zero bytes");
+                    }
+                    else
+                        Assert.Fail("SaveImage() error: " + thisImage.Error);
+                }
+                else
+                    Assert.Fail("Loaded image sizes incorrect - width: " + width.ToString() + ", height: " + height.ToString());
+            }
+            else
+                Assert.Fail("LoadImage() error: " + thisImage.Error);
+        }
     }
 }

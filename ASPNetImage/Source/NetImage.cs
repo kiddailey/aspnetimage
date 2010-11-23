@@ -137,7 +137,7 @@ namespace ASPNetImage
 
         private bool _autoClear = true;
         private bool _constrainResize = true;
-        private string _error;
+        private string _error = "";
         private string _filename = "";
         private ImageFormats _imageFormat = ImageFormats.JPEG;
         private int _jpegQuality = 100;
@@ -852,7 +852,15 @@ namespace ASPNetImage
                 this._image = System.Drawing.Image.FromStream(fileStream);
 
                 if (this._image != null)
+                {
+                    // GIMP thumbnails specifically cause System.Net.Image.Save() to fail and must be removed
+                    // NET removes embedded thumbnails when the image is rotated, so we can easily strip them
+                    // by flipping the image once, and then back again
+                    this.FlipImage(FlipDirections.Horizontal);
+                    this.FlipImage(FlipDirections.Horizontal);
+
                     return true;
+                }
                 else
                     this._error = "Unknown error loading image";
 
