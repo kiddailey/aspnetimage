@@ -10,7 +10,8 @@
     <RootNamespace>ASPNetImage</RootNamespace>
     <AssemblyName>ASPNetImage</AssemblyName>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Resource\ASPNetImage.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,7 +43,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resource\ASPNetImage.pfx" />
     <None Include="Resource\register.bat" />
     <None Include="Resource\unregister.bat" />
   </ItemGroup>
