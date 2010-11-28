@@ -48,6 +48,7 @@
     <Content Include="Resources\1024x768.png" />
     <Content Include="Resources\1440x900.png" />
     <Content Include="Resources\900x1440.png" />
+    <Content Include="Resources\gimpimage.jpg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ASPNetImage\ASPNetImage.csproj">
