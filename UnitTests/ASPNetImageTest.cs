@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using ASPNetImage;
 using NUnit.Framework;
+using System.Security.Cryptography;
+using System.Drawing;
 
 namespace UnitTests
 {
@@ -65,6 +67,64 @@ namespace UnitTests
             catch
             {
             }
+        }
+
+        /// <summary>
+        /// Tests the ClearImage method by taking an all white image, clearing it to all black, 
+        /// and then compare it to a known all-black image using a SHA hash comparison
+        /// </summary>
+        [Test]
+        public void TestClearImage()
+        {
+            string outputFilePath = "../../Output/ClearImage.png";
+
+            ASPNetImage.NetImage thisImage = new NetImage();
+            thisImage.LoadImage("../../Resources/1024x768-white.png");
+            thisImage.ImageFormat = NetImage.ImageFormats.PNG;
+            thisImage.Filename = outputFilePath;
+            thisImage.BackgroundColor = System.Drawing.Color.FromArgb(0, 0, 0).ToArgb();
+            thisImage.ClearImage();
+            thisImage.AutoClear = false;
+            thisImage.SaveImage();
+
+            ASPNetImage.NetImage clearedImage = new NetImage();
+            clearedImage.LoadImage("../../Resources/1024x768-black.png");
+
+            Bitmap modifiedImage = new Bitmap(thisImage.RawNetImage);
+            Bitmap comparisonImage = new Bitmap(clearedImage.RawNetImage);
+
+            ImageConverter thisConverter = new ImageConverter();
+            byte[] modifiedImageBytes = new byte[0];
+            byte[] comparisonImageBytes = new byte[0];
+            modifiedImageBytes = (byte[])thisConverter.ConvertTo(modifiedImage, modifiedImageBytes.GetType());
+            comparisonImageBytes = (byte[])thisConverter.ConvertTo(comparisonImage, comparisonImageBytes.GetType());
+
+            SHA256Managed hasher = new SHA256Managed();
+            byte[] modifiedImageHash = hasher.ComputeHash(modifiedImageBytes);
+            byte[] comparisonImageHash = hasher.ComputeHash(comparisonImageBytes);
+
+            bool isMatch = true;
+            for (int i = 0; i < modifiedImageHash.Length && i < comparisonImageHash.Length && isMatch; i++)
+            {
+                if (modifiedImageHash[i] != comparisonImageHash[i])
+                    isMatch = false;
+            }
+
+            Assert.IsTrue(isMatch);
+        }
+
+        [Test]
+        public void TestFillRect()
+        {
+            string outputFilePath = "../../Output/FillRect.png";
+
+            ASPNetImage.NetImage thisImage = new NetImage();
+            thisImage.LoadImage("../../Resources/1024x768-white.png");
+            thisImage.ImageFormat = NetImage.ImageFormats.PNG;
+            thisImage.Filename = outputFilePath;
+            thisImage.PenColor = System.Drawing.Color.FromArgb(0, 0, 0).ToArgb();
+            thisImage.FillRect(10, 10, 20, 20);
+            thisImage.SaveImage();
         }
 
         [Test]
