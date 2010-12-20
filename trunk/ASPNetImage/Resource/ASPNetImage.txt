@@ -57,8 +57,10 @@ Fully Implemented
 	Methods:
 
 		BrightenImage
+		ClearImage
 		CropImage
 		DarkenImage
+		FillRect
 		FlipImage
 		GetImageFileSize
 		LoadImage
@@ -74,7 +76,7 @@ Partially Implemented
 		Returns the error from LoadImage and SaveImage methods only.
 		
 		ImageFormat
-		Only JPEG format is supported for output
+		Only JPEG, BMP, GIF and PNG formats are supported for output
 		
 	Methods:
 		
