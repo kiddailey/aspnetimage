@@ -2,6 +2,7 @@ using System;
 using System.Drawing.Imaging;
 using System.Drawing;
 using System.IO;
+using System.Drawing.Drawing2D;
 
 namespace ASPNetImage
 {
@@ -255,6 +256,17 @@ namespace ASPNetImage
         }
 
         /// <summary>
+        /// Gets the classes .NET image instance
+        /// </summary>
+        public Image RawNetImage
+        {
+            get
+            {
+                return this._image;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the image format to be used when saving the image. Not currently
         /// supported and only JPG format is output.
         /// </summary>
@@ -461,10 +473,6 @@ namespace ASPNetImage
         {
         }
 
-        public void ClearImage()
-        {
-        }
-
         public void ClearTexture()
         {
         }
@@ -509,10 +517,6 @@ namespace ASPNetImage
         {
         }
 
-        public void FillRect(int intLeft, int intTop, int intRight, int intBottom)
-        {
-        }
-
         public void FishEye(int intDegree)
         {
         }
@@ -532,6 +536,20 @@ namespace ASPNetImage
 
         public void GradientOneWay(int intBeginColor, int intEndColor, int intDirection)
         {
+            //Graphics graphicsDest = Graphics.FromImage(this._image);
+            //LinearGradientBrush thisBrush;
+            
+            //switch (intDirection)
+            //{
+            //    case 0:
+            //        // up
+            //        thisBrush = new LinearGradientBrush(
+            //            new Point(this._image.Width / 2, this._image.Height - 1), 
+            //            new Point(this._image.Width / 2, 0), 
+            //            Color.FromArgb(intBeginColor), 
+            //            Color.FromArgb(intEndColor));
+
+            //}
         }
 
         public void GradientTwoWay(int intBeginColor, int intEndColor, int intDirection, int intInOut)
@@ -671,6 +689,22 @@ namespace ASPNetImage
         #endregion
 
         /// <summary>
+        /// Clears the entire image with the current BackgroundColor
+        /// </summary>
+        public void ClearImage()
+        {
+            Graphics graphicsDest = Graphics.FromImage(this._image);
+            graphicsDest.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+            Color brushColor = Color.FromArgb(this.BackgroundColor);
+            Brush coloredBrush = new SolidBrush(brushColor);
+            graphicsDest.FillRectangle(coloredBrush, 0, 0, this._image.Width, this._image.Height);
+            graphicsDest.DrawImage(this._image, 0, 0);
+
+            graphicsDest.Dispose();
+            coloredBrush.Dispose();
+        }
+
+        /// <summary>
         /// Crops the image with the specified dimensions
         /// </summary>
         /// <param name="intStartX"></param>
@@ -688,6 +722,26 @@ namespace ASPNetImage
             this._image = croppedImage;
 
             graphicsCrop.Dispose();
+        }
+
+        /// <summary>
+        /// Fills the specified rectangle with the current PenColor
+        /// </summary>
+        /// <param name="intLeft"></param>
+        /// <param name="intTop"></param>
+        /// <param name="intRight"></param>
+        /// <param name="intBottom"></param>
+        public void FillRect(int intLeft, int intTop, int intRight, int intBottom)
+        {
+            Graphics graphicsDest = Graphics.FromImage(this._image);
+            graphicsDest.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+            Color brushColor = Color.FromArgb(this.PenColor);
+            Brush coloredBrush = new SolidBrush(brushColor);
+            graphicsDest.FillRectangle(coloredBrush, intLeft, intTop, intRight - intLeft, intBottom - intTop);
+            graphicsDest.DrawImage(this._image, 0, 0);
+
+            graphicsDest.Dispose();
+            coloredBrush.Dispose();
         }
 
         /// <summary>
@@ -893,18 +947,76 @@ namespace ASPNetImage
                 EncoderParameter imageEncoderParameter;
                 EncoderParameters imageEncoderParameters;
 
-                imageCodecInfo = GetEncoderInfo("image/jpeg");
-                imageEncoder = Encoder.Quality;
-                imageEncoderParameters = new EncoderParameters(1);
-                imageEncoderParameter = new EncoderParameter(imageEncoder, this.JPEGQuality);
-                imageEncoderParameters.Param[0] = imageEncoderParameter;
+                switch (this.ImageFormat)
+                {
+                    case ImageFormats.BMP:
 
-                this.Filename = Path.ChangeExtension(this.Filename, "jpg");
+                        this.Filename = Path.ChangeExtension(this.Filename, "bmp");
+
+                        try
+                        {
+                            this._image.Save(this.Filename, System.Drawing.Imaging.ImageFormat.Bmp);
+                        }
+                        catch (Exception e)
+                        {
+                            this._error = e.ToString();
+                        }
+                        break;
+
+                    case ImageFormats.GIF:
+
+                        this.Filename = Path.ChangeExtension(this.Filename, "gif");
+
+                        try
+                        {
+                            this._image.Save(this.Filename, System.Drawing.Imaging.ImageFormat.Gif);
+                        }
+                        catch (Exception e)
+                        {
+                            this._error = e.ToString();
+                        }
+                        break;
+
+                    case ImageFormats.PNG:
+
+                        this.Filename = Path.ChangeExtension(this.Filename, "png");
+
+                        try
+                        {
+                            this._image.Save(this.Filename, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                        catch (Exception e)
+                        {
+                            this._error = e.ToString();
+                        }
+
+                        break;
+
+                    case ImageFormats.JPEG:
+                    default:
+
+                        imageCodecInfo = GetEncoderInfo("image/jpeg");
+                        imageEncoder = Encoder.Quality;
+                        imageEncoderParameters = new EncoderParameters(1);
+                        imageEncoderParameter = new EncoderParameter(imageEncoder, this.JPEGQuality);
+                        imageEncoderParameters.Param[0] = imageEncoderParameter;
+
+                        this.Filename = Path.ChangeExtension(this.Filename, "jpg");
+
+                        try
+                        {
+                            this._image.Save(this.Filename, imageCodecInfo, imageEncoderParameters);
+                        }
+                        catch (Exception e)
+                        {
+                            this._error = e.ToString();
+                        }
+
+                        break;
+                }
 
                 try
                 {
-                    this._image.Save(this.Filename, imageCodecInfo, imageEncoderParameters);
-
                     if (File.Exists(this.Filename))
                     {
                         if (this.AutoClear)
