@@ -1,0 +1,7 @@
+=Troubleshooting Installation Issues=
+
+ * Verify that the .NET Framework v2.0 is installed and working properly.
+
+ * Ensure that you've registered the DLL with REGASM.EXE with the /tlb and /codebase command line switches (see the included register.bat file).  You may want to unregister the DLL and re-register them to confirm.
+
+ * Make sure the DLL and TLB files have the correct file permissions.  Give read/write/execute access to NETWORK, NETWORK_SERVICE and the IUSER_[machineName] accounts.
