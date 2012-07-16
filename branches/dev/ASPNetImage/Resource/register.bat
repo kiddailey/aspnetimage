@@ -1,3 +1,3 @@
 @echo off
-c:\Windows\Microsoft.NET\Framework\v2.0.50727\regasm.exe ..\bin\release\ASPNetImage.dll /tlb /codebase
+c:\Windows\Microsoft.NET\Framework\v4.0.30319\regasm.exe ASPImage.dll /tlb /codebase
 pause
