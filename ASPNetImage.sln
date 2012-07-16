@@ -1,17 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPNetImage", "ASPNetImage\ASPNetImage.csproj", "{B56B76E7-0BF9-4439-8AEB-91C6709628C5}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{EFB48FB4-4982-49E4-A007-98BFCE885C70}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testWeb", "testWeb\testWeb.csproj", "{5E572EE0-30C5-45E9-AD31-45A159295AC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +21,10 @@ Global
 		{EFB48FB4-4982-49E4-A007-98BFCE885C70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFB48FB4-4982-49E4-A007-98BFCE885C70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFB48FB4-4982-49E4-A007-98BFCE885C70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E572EE0-30C5-45E9-AD31-45A159295AC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E572EE0-30C5-45E9-AD31-45A159295AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E572EE0-30C5-45E9-AD31-45A159295AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E572EE0-30C5-45E9-AD31-45A159295AC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
