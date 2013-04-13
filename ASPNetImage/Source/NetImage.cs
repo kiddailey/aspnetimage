@@ -63,7 +63,8 @@ namespace ASPNetImage
         public enum BlobTypes : int
         {
             JPEG = 1,
-            BMP = 2
+            BMP = 2,
+            PNG = 3
         }
 
         public enum BrushStyles : int
@@ -109,15 +110,15 @@ namespace ASPNetImage
             PCX = 7
         }
 
-        public enum PenStyles : int
+        public enum PenStyles
         {
             Solid = 0,
             Dash = 1,
             Dot = 2,
             DashDot = 3,
-            DashDotDot = 4,
-            Clear = 5,
-            InsideFrame = 6
+            DashDotDot = 4
+            //Clear = 5,
+            //InsideFrame = 6
         }
 
         public enum PixelFormats : int
@@ -155,7 +156,14 @@ namespace ASPNetImage
         private int _maxX = 0; //GF
         private int _maxY = 0; //GF
         private System.Drawing.Image _image;
-        private string _registeredTo = "This Organization";
+        private string _registeredTo = "Open Source";
+        private Single _textAngle = 0;
+        private int _penColor = 0;
+        private int _penStyle = 0;
+        private int _penWidth = 0;
+        private int _X = 0;
+        private int _Y = 0;
+        private int _DPI = 96;
 
         #endregion
 
@@ -168,23 +176,16 @@ namespace ASPNetImage
         public bool AutoSize = true;
         public int BrushColor = 0;
         public int BrushStyle = 0;
-        public int DPI = 96;
         public bool Italic = false;
         public int PadSize = 0;
-        public int PenColor = 0;
-        public int PenStyle = 0;
-        public int PenWidth = 0;
         public int PixelFormat = 6;
         public bool Strikeout = false;
         public TextAlignments TextAlign = TextAlignments.Left;
-        public int TextAngle = 0;
         public int ThreeDColor = 0;
         public bool Transparent = false;
         public int TransparentColor = 0;
         public bool TransparentText = true;
         public bool Underline = false;
-        public int X = 0;
-        public int Y = 0;
 
         #endregion
 
@@ -497,6 +498,42 @@ namespace ASPNetImage
         }
 
         /// <summary>
+        /// Pen color RGB
+        /// </summary>
+        public int PenColor
+        {
+            get { return _penColor; }
+            set { _penColor = value; }
+        }
+
+        /// <summary>
+        /// PenStyle 
+        /// Style determines the style in which the pen draws lines.
+        /// Value	Type	Description
+        /// 0	Solid	A solid line.
+        /// 1	Dash	A line made up of a series of dashes.
+        /// 2 	Dot	A line made up of a series of dots.
+        /// 3	DashDot	A line made up of alternating dashes and dots.
+        /// 4	DashDotDot	A line made up of a serious of dash-dot-dot combinations.
+        /// </summary>
+        public int PenStyle
+        {
+            get { return _penStyle ; }
+            set { _penStyle = value; }
+        }
+
+        /// <summary>
+        /// PenWidth specifies the maximum width of the pen in pixels.
+        /// Example:
+        /// Image.PenWidth = 2
+        /// </summary>
+        public int PenWidth
+        {
+            get { return _penWidth; }
+            set { _penWidth = value; }
+        }
+
+        /// <summary>
         /// Gets or sets who the component is registered to.  Provided for compatibility
         /// </summary>
         public string RegisteredTo
@@ -511,6 +548,18 @@ namespace ASPNetImage
             }
         }
 
+        public Single TextAngle
+        { 
+            get 
+            { 
+                return this._textAngle; 
+            } 
+            set 
+            { 
+                this._textAngle = value; 
+            } 
+        }
+
         /// <summary>
         /// Returns the current version number of the component
         /// </summary>
@@ -519,6 +568,49 @@ namespace ASPNetImage
             get
             {
                 return "2.3.1.0 (ASPNetImage v0.2)";
+            }
+        }
+
+        public Int32 X
+        {
+            get
+            {
+                return this._X;
+            }
+            set
+            {
+                this._X = value;
+            }
+        }
+
+        public Int32 Y
+        {
+            get
+            {
+                return this._Y;
+            }
+            set
+            {
+                this._Y = value;
+            }
+        }
+
+        /// <summary>
+        /// Set DPI
+        /// </summary>
+        public int DPI
+        {
+            get
+            {
+                return this._DPI;
+            }
+            set
+            {
+                this._DPI = value;
+                Bitmap tempImage = new Bitmap(this._image);
+                tempImage.SetResolution(value, value);
+                this._image.Dispose();
+                this._image = tempImage;
             }
         }
 
@@ -587,6 +679,67 @@ namespace ASPNetImage
             attributes.Dispose();
             newGraphics.Dispose();
         }
+        
+        /// <summary>
+        /// Converte un byte array in una System.Drawing.Image
+        /// </summary>
+        /// <param name="imageIn"></param>
+        /// <returns></returns>
+        private byte[] imageToByteArray(System.Drawing.Image imageIn, ImageFormat imgFormat)
+        {
+            MemoryStream ms = new MemoryStream();
+            imageIn.Save(ms, imgFormat);
+            return ms.ToArray();
+        }
+
+        /// <summary>
+        /// Converte una System.Drawing.Image in un byte array
+        /// </summary>
+        /// <param name="byteArrayIn"></param>
+        /// <returns></returns>
+        private Image byteArrayToImage(byte[] byteArrayIn)
+        {
+            MemoryStream ms = new MemoryStream(byteArrayIn);
+            Image returnImage = System.Drawing.Image.FromStream(ms);
+            return returnImage;
+        }
+
+        /// <summary>
+        ///Devo fare questo giro perché a volte l'immagine ha un formato particolare e quindi va in eccezione
+        ///Eccezione: "Impossibile creare un oggetto Graphics da un'immagine con formato a pixel indicizzato"
+        /// </summary>
+        /// <param name="image">immagine</param>
+        /// <param name="tipo">estensione dell'immagine</param>
+        /// <returns></returns>
+        private Graphics getGraphicsImage(Image image, string tipo)
+        {
+            Graphics gra;
+            try
+            {
+                gra = Graphics.FromImage(image);
+            }
+            catch (Exception)
+            {
+                MemoryStream ms = new MemoryStream();
+                switch (tipo.ToLower())
+                {
+                    case "gif":
+                        image.Save(ms, System.Drawing.Imaging.ImageFormat.Gif);
+                        break;
+                    case "png":
+                        image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        break;
+                    default:
+                        image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        break;
+                }
+                Image img;
+                img = System.Drawing.Image.FromStream(ms);
+                gra = Graphics.FromImage(img);
+            }
+            return gra;
+        }
+
 
         #endregion
 
@@ -703,6 +856,11 @@ namespace ASPNetImage
 
         public void LineTo(int intX, int intY)
         {
+            Graphics graphicsDest = Graphics.FromImage(this._image);
+            Pen pen = new Pen(Color.FromArgb((Int32)BitConverter.GetBytes(PenColor)[2], (Int32)BitConverter.GetBytes(PenColor)[1], (Int32)BitConverter.GetBytes(PenColor)[0]));
+            pen.Width = PenWidth;
+            pen.DashStyle = (DashStyle)PenStyle;
+            graphicsDest.DrawLine(pen, X, Y, intX, intY);
         }
 
         public bool LoadTexture(string strFileName)
@@ -732,6 +890,11 @@ namespace ASPNetImage
 
         public void Rectangle(int intX1, int intY1, int intX2, int intY2)
         {
+            Graphics graphicsDest = getGraphicsImage(this._image, this.ImageFormat.ToString());
+            Pen pen = new Pen(Color.FromArgb((Int32)BitConverter.GetBytes(PenColor)[2], (Int32)BitConverter.GetBytes(PenColor)[1], (Int32)BitConverter.GetBytes(PenColor)[0]));
+            pen.Width = PenWidth;
+            pen.DashStyle = (DashStyle)PenStyle;
+            graphicsDest.DrawRectangle(pen, intX1, intY1, intX2, intY2);
         }
 
         /// <summary>
@@ -846,6 +1009,31 @@ namespace ASPNetImage
             }
             return false;
         }
+
+        /// <summary>
+        /// Adds a new image to the canvas using the intX and intY coordinates passing an Image
+        /// <param name="strFileName"></param>
+        /// <param name="intX"></param>
+        /// <param name="intY"></param>
+        /// </summary>
+        public bool AddImage(byte[] ImageToAdd, int intX, int intY) //GF
+        {
+            Graphics graphicsDest = Graphics.FromImage(this._image);
+            try
+            {
+                graphicsDest.DrawImage(byteArrayToImage(ImageToAdd), intX, intY);
+            }
+            catch (Exception e)
+            {
+                this._error = e.ToString();
+            }
+            finally
+            {
+                graphicsDest.Dispose();
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// Clears the entire image with the current BackgroundColor
@@ -1128,6 +1316,24 @@ namespace ASPNetImage
         }
 
         /// <summary>
+        /// Resize proportionally based on width
+        /// </summary>
+        /// <param name="width"></param>
+        public void ResizeOnWidth(int width) {
+            int height = (int)Math.Round(((double)width / (double)this.MaxX) * (double)this.MaxY);
+            Resize(width, height);
+        }
+
+        /// <summary>
+        /// Resize proportionally based on height
+        /// </summary>
+        /// <param name="height"></param>
+        public void ResizeOnHeight(int height) {
+            int width = (int)Math.Round(((double)height / (double)this.MaxY) * (double)this.MaxX);
+            Resize(width, height);
+        }
+
+        /// <summary>
         /// Brightens an image by the specified percentage
         /// </summary>
         /// <param name="percentage"></param>
@@ -1165,6 +1371,7 @@ namespace ASPNetImage
         /// The parameter intType indicates what type of format the binary data is in. Valid intTypes are:
         ///     1: JPEG 
         ///     2: BMP 
+        ///     3: PNG 
         /// </summary>
         /// <param name="ovBlob"></param>
         /// <param name="intType"></param>
@@ -1188,6 +1395,8 @@ namespace ASPNetImage
                         this.ImageFormat = ImageFormats.JPEG;
                     if (intType == 2)
                         this.ImageFormat = ImageFormats.BMP;
+                    if (intType == 3)
+                        this.ImageFormat = ImageFormats.PNG;
 
                     return true;
                 }
@@ -1367,8 +1576,8 @@ namespace ASPNetImage
         }
 
         /// <summary>
-        /// TextOut writes a text value using the current font, color and other 
-        /// characteristics to the imageat the location specified by intX and intY. 
+        /// TextOut writes a text value using the current font, color, angle and other 
+        /// characteristics to the image at the location specified by intX and intY. 
         /// If bol3d is true then the text is rendered using a 3d look
         /// </summary>
         /// <param name="strText"></param>
@@ -1382,11 +1591,43 @@ namespace ASPNetImage
                 graphicsDest.TextRenderingHint = TextRenderingHint.AntiAlias;
 
             Font font = new Font(FontName, Convert.ToSingle(FontSize));
-            Color color = Color.FromArgb(Convert.ToInt32(FontColor % 256),
-                                         Convert.ToInt32(Math.Round((float)(FontColor / 256), 0) % 256),
-                                         Convert.ToInt32(Math.Round((float)(FontColor / 65536), 0) % 256));
+            Color color = Color.FromArgb((Int32)BitConverter.GetBytes(FontColor)[2], (Int32)BitConverter.GetBytes(FontColor)[1], (Int32)BitConverter.GetBytes(FontColor)[0]);
             Brush brush = new SolidBrush(color);
-            graphicsDest.DrawString(strText, font, brush, new Point(intX, intY));
+            if (TextAngle == 0)
+            {
+                graphicsDest.DrawString(strText, font, brush, new Point(intX, intY));
+            }
+            else 
+            {
+                // reduce angle to 0°-360° range 
+                Single angle = TextAngle;
+                if (angle > 360)
+                {
+                    while (angle > 360)
+                    {
+                        angle = angle - 360;
+                    }
+                }
+                else if (angle < 0)
+                {
+                    while (angle < 0)
+                    {
+                        angle = angle + 360;
+                    }
+                }
+                // save graphics state
+                GraphicsState state = graphicsDest.Save();
+                // clear any traformations already in progress
+                graphicsDest.ResetTransform();
+                // rotate
+                graphicsDest.RotateTransform(angle);
+                // translate origin to compensate rotation
+                graphicsDest.TranslateTransform(intX, intY, MatrixOrder.Append);
+                // write text
+                graphicsDest.DrawString(strText, font, brush, 0, 0);
+                // restore graphic state
+                graphicsDest.Restore(state);
+            }
             graphicsDest.Dispose();
             brush.Dispose();
             font.Dispose();

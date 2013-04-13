@@ -39,10 +39,27 @@ namespace testWeb
 
             //image.LoadBlob(MyData, 1);
             image.LoadImage(Server.MapPath("prova.jpg"));
-            image.ResizeR(2000, 1000);
-            //image.FontSize = 580;
-            //image.FontName = "Arial";
-            //image.AntiAliasText = true;
+            image.FontSize = 100;
+            image.FontName = "Arial";
+            image.AntiAliasText = true;
+            image.TextAngle = 0;
+            image.TextOut("testo orizzontale", 1800, 1200, false);
+            image.TextAngle = 45;
+            image.TextOut("testo inclinato alto-basso", 1800, 1200, false);
+            image.TextAngle = 90;
+            image.TextOut("testo verticale alto-basso", 1800, 1200, false);
+            image.TextAngle = 135;
+            image.TextOut("testo rovesciato alto-basso", 1800, 1200, false);
+            image.TextAngle = 180;
+            image.TextOut("testo rovesciato orizzontale", 1800, 1200, false);
+            image.TextAngle = 225;
+            image.TextOut("testo rovesciato basso-alto", 1800, 1200, false);
+            image.TextAngle = 270;
+            image.TextOut("testo verticale basso-alto", 1800, 1200, false);
+            image.TextAngle = 315;
+            image.TextOut("testo inclinato basso-alto", 1800, 1200, false);
+
+            //image.ResizeR(2000, 1000);
             //image.TextOut("chissa chi lo sa".ToString(), 200, 100, false);
             image.Filename = Server.MapPath("prova2.jpg");
             image.SaveImage();
