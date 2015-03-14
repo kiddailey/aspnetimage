@@ -65,7 +65,7 @@ ASPNetImage is a work in progress and any help completing the object is apprecia
 
 # Troubleshooting
 
-**Troubleshooting Installation Issues**
+**Installation Issues**
 
 * Verify that the .NET Framework v2.0 is installed and working properly.
 
@@ -73,12 +73,14 @@ ASPNetImage is a work in progress and any help completing the object is apprecia
 
 * Make sure the DLL and TLB files have the correct file permissions.  Give read/write/execute access to NETWORK, NETWORK_SERVICE and the IUSER_[machineName] accounts.
 
-* As of this writing, the precompiled DLL is only provided in 32bit format. There may be unknown issues running this on a 64bit OS.  Precompiled 64bit variations are planned for sometime in the future.
-
-* Some image format variations have been known to cause issues. Try alternate images from a different source.  If you experience issues loading certain images and not others, please provide the problem image(s) if possible along with a bug report.
-
 * If you are using an unsigned DLL, you will receive the following error message when registering the DLL with REGASM.EXE:
 
   > RegAsm : warning RA0000 : Registering an unsigned assembly with /codebase can cause your assembly to interfere with other applications that may be installed on the same computer. The /codebase switch is intended to be used only with signed assemblies. Please give your assembly a strong name and re-register it.""
 
   The object should still work, but I'd recommend unregistering it, compiling and signing the DLL yourself before registering it again so that you don't receive the warning message. Visual Studio 2005 and up can do this automatically from the Project Properties panel on the "Signing" tab. Just pick "< New >" and follow the prompts.
+
+**Other**
+
+* As of this writing, the precompiled DLL is only provided in 32bit format. There may be unknown issues running this on a 64bit OS.  Precompiled 64bit variations are planned for sometime in the future.
+
+* Some image format variations have been known to cause issues. Try alternate images from a different source.  If you experience issues loading certain images and not others, please provide the problem image(s) if possible along with a bug report.
