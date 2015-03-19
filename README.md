@@ -14,53 +14,115 @@ ASPNetImage is a work in progress and any help completing the object is apprecia
 
 
 ## Properties
+   
+   * *AntiAliasText*:boolean<br />Gets or sets whether anti-aliased text is added on the image.  Default is true.
 
    * *AutoClear*:boolean<br />If true, class will automatically dispose image data when the SaveImage method is called.  Default is true.
+   
+   * *BackgroundColor*:int<br />Gets or sets the background color for future image manipulations.
+   
+   * *Bold*:boolean<br />Gets or sets whether text is to be rendered in bold faced style.  Default is false.
 
    * *ConstrainResize*:boolean<br />When set to true, automatically crops the image during a resize to fit the dimensions and retain the original image's aspect ratio.  Default is true. _New with ASPNetImage._
-
-   * *Expires*:DateTime<br />Returns the date that the component expires. Included for compatibility. Always returns future date
+   
+   * *DPI*:int<br />Gets or sets the DPI for the current image.  Default is 96.
 
    * *Error*:string<br />_Partially implemented._ Returns the last error from LoadImage and SaveImage methods only.
 
-   * *Filename*:string<br />Gets or sets the full path and filename to be used by the SaveImage method
+   * *Expires*:DateTime<br />Returns the date that the component expires. Included for compatibility. Always returns future date.
+
+   * *Filename*:string<br />Gets or sets the full path and filename to be used by the SaveImage method.
+   
+   * *FontColor*:int<br />Gets or sets the argb color value to be used when rendering text.
+   
+   * *FontName*:string<br />Gets or sets the name of the font to be used when drawing text.  Default is "MS Sans Serif."
+   
+   * *FontSize*:int<br />Gets or sets the pixel size of the font to be used when rendering text.  Default is 12 pixels.
 
    * *ImageFormat*:int<br />_Partially implemented._ Gets or sets the image format to be used by the SaveImage method.  Currently only JPEG format is supported for output.  Enumerated.  See ASPNetImage.ImageFormats.
 
    * *JPEGQuality*:int<br />Gets or sets the output quality percentage of JPEG images when SaveImage is called to save a JPEG. Valid amounts are 1 to 100.
+   
+   * *MaxX*:int<br />Gets or sets the width of the image.
+   
+   * *MaxY*:int<br />Gets or sets the height of the image.
+   
+   * *PenColor*:int<br />Gets or sets the argb color value to be used when drawing using the pen.
+   
+   * *PenStyle*:int<br />Gets or sets the line style to be used when drawing using the pen.
+   
+   * *PenWidth*:int<br />Gets or sets the pixel width of the pen when drawing.
+   
+   * *ProgressiveJPEGEncoding*:boolean<br />Gets or sets whether JPG images should be saved with progressive encoding.
+   
+   * *RawNetImage*:Image<br />Returns the .NET Image instance.
 
-   * *RegisteredTo*:string<br />Gets or sets the name that the component is registered to.  Included for compatibility. Returns "This Organization" by default, but can be set to any string
+   * *RegisteredTo*:string<br />Gets or sets the name that the component is registered to.  Included for compatibility. Returns "This Organization" by default, but can be set to any string.
+   
+   * *TextAngle*:int<br />Gets or sets the angle to be used when rendering text.  Default is 0 (horizontal).
 
-   * *Version*:string<br />Returns last known ASPImage version with "(ASPNetImage)" appended
+   * *Version*:string<br />Returns last known ASPImage version with "(ASPNetImage vX.X)" appended.
+   
+   * *X*:Int32<br />Gets or sets the current X coordinate of the pen used for drawing.
+   
+   * *Y*:Int32<br />Gets or sets the current X coordinate of the pen used for drawing.
 
 
 ## Methods
 
-  * *BrightenImage*<br />Increases the brightness of the image
+  * *AddImage*<br />Adds a new image to the canvas using the provided coordinates.
 
-  * *ClearImage*<br />Clears the image
+  * *BrightenImage*<br />Increases the brightness of the image.
 
-  * *CropImage*<br />Crops the image
+  * *ClearImage*<br />Clears the image.
+  
+  * *Contrast*<br />Modifies the image's contrast.
+  
+  * *CreateGrayScale*<br />Converts the image into a gray scale image.
+  
+  * *CreateNegative*<br />Creates a negative image effect of the current image.
 
-  * *DarkenImage*<br />Darkens the image
+  * *CropImage*<br />Crops the image.
+
+  * *DarkenImage*<br />Darkens the image.
+  
+  * *Emboss*<br />Creates an embossing effect on the image.
 
   * *FillRect*<br />Fills a rectangle area of the image with a given color.
 
-  * *FlipImage*<br />Flips the image
+  * *FlipImage*<br />Flips the image.
 
   * *GetImageFileSize*<br />Returns the image dimensions for the image specified by full file path and name. Currently incurs memory hit as image has to be loaded to determine dimensions.
 
   * *GetImageSize*<br />Returns the image dimensions for the currently loaded image. _New with ASPNetImage._
+  
+  * *GetPixel*<br />Returns the color value (argb) for the pixel at the specified x and y coordinates.
+  
+  * *LineTo*<br />Draws a line from the current pen coordinates to the specified destination with the current pen color and width.
+  
+  * *LoadBlob*<br />Loads binary imag data onto the image canvas.
 
-  * *LoadImage*<br />Loads an image from disk at the specified filepath
+  * *LoadImage*<br />Loads an image from disk at the specified filepath.
+  
+  * *Rectangle*<br />Draws a rectangle with the coordinates of the upper-left and lower-right coordinates provided.
 
-  * *Resize*<br />Resizes the image
+  * *Resize*<br />Resizes the image.
+  
+  * *ResizeOnHeight*<br />Resize proportionally based on height.  _New with ASPNetImage._
+  
+  * *ResizeOnWidth*<br />Resize proportionally based on width. _New with ASPNetImage._
 
   * *ResizeR*<br />_Partially implemented._ Calls the Resize method.
 
   * *RotateImage*<br />_Partially implemented._ Rotates the image.  Currently only rotates at 90, 180 and 270 degrees clockwise
 
   * *SaveImage*<br />_Partially implemented._ Saves the image, but currently only in JPEG format.
+  
+  * *TextHeight*<br />Returns the text height of a string using the current font, font size and font characteristics.
+  
+  * *TextOut*<br />Writes a string of text using the current font, font size and font characteristics.
+  
+  * *TextWidth*<br />Returns the text width for a string value using the current font, font size and font characteristics.
 
 
 # Environment Configuration
