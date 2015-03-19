@@ -1,8 +1,11 @@
 using System;
 using System.Drawing.Imaging;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
+using System.Drawing.Text;
 
 namespace ASPNetImage
 {
@@ -19,6 +22,7 @@ namespace ASPNetImage
     ///
     /// ASPImage Copyright ServerObjects Inc.
     /// </summary>
+    [ProgId("AspImage.Image")]
     public class NetImage
     {
         // ====================================================================
@@ -29,6 +33,29 @@ namespace ASPNetImage
         /// </summary>
         public NetImage()
         {
+            _dpi = 96;
+            _y = 0;
+            _x = 0;
+            _penWidth = 0;
+            _penStyle = 0;
+            _penColor = 0;
+            _textAngle = 0;
+            _registeredTo = "Open Source";
+            _maxY = 0;
+            _maxX = 0;
+            _progressiveJPEGEncoding = false;
+            _jpegQuality = 100;
+            _imageFormat = ImageFormats.JPEG;
+            _fontSize = 12;
+            _fontName = "MS Sans Serif";
+            _fontColor = 0;
+            _filename = "";
+            _error = "";
+            _constrainResize = true;
+            _backgroundColor = Color.FromArgb(255, 0, 0, 0).ToArgb(); // Default to black
+            _bold = false;
+            _autoClear = true;
+            _antiAliasText = false;
         }
 
         #endregion
@@ -44,7 +71,7 @@ namespace ASPNetImage
         {
             try
             {
-                this._image.Dispose();
+                _image.Dispose();
             }
             catch
             {
@@ -60,7 +87,8 @@ namespace ASPNetImage
         public enum BlobTypes : int
         {
             JPEG = 1,
-            BMP = 2
+            BMP = 2,
+            PNG = 3
         }
 
         public enum BrushStyles : int
@@ -106,15 +134,15 @@ namespace ASPNetImage
             PCX = 7
         }
 
-        public enum PenStyles : int
+        public enum PenStyles
         {
             Solid = 0,
             Dash = 1,
             Dot = 2,
             DashDot = 3,
-            DashDotDot = 4,
-            Clear = 5,
-            InsideFrame = 6
+            DashDotDot = 4
+            //Clear = 5,
+            //InsideFrame = 6
         }
 
         public enum PixelFormats : int
@@ -136,15 +164,30 @@ namespace ASPNetImage
         // ====================================================================
         #region Private Properties
 
-        private bool _autoClear = true;
-        private bool _constrainResize = true;
-        private string _error = "";
-        private string _filename = "";
-        private ImageFormats _imageFormat = ImageFormats.JPEG;
-        private int _jpegQuality = 100;
-        private bool _progressiveJPEGEncoding = false;
+        private bool _autoClear;
+        private bool _antiAliasText;
+        private int _backgroundColor;
+        private bool _bold;
+        private bool _constrainResize;
+        private string _error;
+        private string _filename;
+        private int _fontColor;
+        private string _fontName;
+        private int _fontSize;
+        private ImageFormats _imageFormat;
+        private int _jpegQuality;
+        private bool _progressiveJPEGEncoding;
+        private int _maxX;
+        private int _maxY;
         private System.Drawing.Image _image;
-        private string _registeredTo = "This Organization";
+        private string _registeredTo;
+        private Single _textAngle;
+        private int _penColor;
+        private int _penStyle;
+        private int _penWidth;
+        private int _x;
+        private int _y;
+        private int _dpi;
 
         #endregion
 
@@ -154,34 +197,19 @@ namespace ASPNetImage
         // --------------------------------------------------------------------
         #region Legacy Properties To Be Implemented
 
-        public bool AntiAliasText = true;
         public bool AutoSize = true;
-        public int BackgroundColor = 0;
         public int BrushColor = 0;
         public int BrushStyle = 0;
-        public bool Bold = false;
-        public int DPI = 96;
-        public int FontColor = 0;
-        public string FontName = "MS Sans Serif";
-        public int FontSize = 12;
         public bool Italic = false;
-        public int MaxX = 0;
-        public int MaxY = 0;
         public int PadSize = 0;
-        public int PenColor = 0;
-        public int PenStyle = 0;
-        public int PenWidth = 0;
         public int PixelFormat = 6;
         public bool Strikeout = false;
         public TextAlignments TextAlign = TextAlignments.Left;
-        public int TextAngle = 0;
         public int ThreeDColor = 0;
         public bool Transparent = false;
         public int TransparentColor = 0;
         public bool TransparentText = true;
         public bool Underline = false;
-        public int X = 0;
-        public int Y = 0;
 
         #endregion
 
@@ -193,11 +221,60 @@ namespace ASPNetImage
         {
             get
             {
-                return this._autoClear;
+                return _autoClear;
             }
             set
             {
-                this._autoClear = value;
+                _autoClear = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether anti-aliased text is added on the image
+        /// </summary>
+        public bool AntiAliasText
+        {
+            get
+            {
+                return _antiAliasText;
+            }
+            set
+            {
+                _antiAliasText = value;
+            }
+        }
+
+        /// <summary>
+        /// Integer value specifies the background color for NEW image manipulations. 
+        /// It does not magically set the "background" to the specified color
+        /// </summary>
+        public int BackgroundColor
+        {
+            get
+            {
+                return _backgroundColor;
+            }
+            set
+            {
+                // Set alpha channel to opaque, VBSCRIPT constants set it to 0 so the fill
+                // does not work because 0 means transparent
+                // Only solid colors are currently supported
+                _backgroundColor = (int)((uint)value | 0xFF000000);
+            }
+        }
+
+        /// <summary>
+        /// True/false value determines if font is bold or not 
+        /// </summary>
+        public bool Bold
+        {
+            get
+            {
+                return _bold;
+            }
+            set
+            {
+                _bold = value;
             }
         }
 
@@ -209,11 +286,11 @@ namespace ASPNetImage
         {
             get
             {
-                return this._constrainResize;
+                return _constrainResize;
             }
             set
             {
-                this._constrainResize = value;
+                _constrainResize = value;
             }
         }
 
@@ -224,7 +301,7 @@ namespace ASPNetImage
         {
             get
             {
-                return this._error;
+                return _error;
             }
         }
 
@@ -236,7 +313,7 @@ namespace ASPNetImage
             get
             {
                 // TODO: Verify date format returned from original component
-                return DateTime.Now.AddYears(50).ToString();
+                return DateTime.Now.AddYears(50).ToString(CultureInfo.InvariantCulture);
             }
         }
 
@@ -247,11 +324,56 @@ namespace ASPNetImage
         {
             get
             {
-                return this._filename;
+                return _filename;
             }
             set
             {
-                this._filename = value.Trim();
+                _filename = value.Trim();
+            }
+        }
+
+        /// <summary>
+        /// The integer FontColor specifies the color of the font 
+        /// </summary>
+        public int FontColor
+        {
+            get
+            {
+                return _fontColor;
+            }
+            set
+            {
+                _fontColor = value;
+            }
+        }
+
+        /// <summary>
+        /// The string FontName specifies the name of the font
+        /// </summary>
+        public string FontName
+        {
+            get
+            {
+                return _fontName;
+            }
+            set
+            {
+                _fontName = value;
+            }
+        }
+
+        /// <summary>
+        /// The integer FontSize specifies the size of the font
+        /// </summary>
+        public int FontSize
+        {
+            get
+            {
+                return _fontSize;
+            }
+            set
+            {
+                _fontSize = value;
             }
         }
 
@@ -262,23 +384,22 @@ namespace ASPNetImage
         {
             get
             {
-                return this._image;
+                return _image;
             }
         }
 
         /// <summary>
-        /// Gets or sets the image format to be used when saving the image. Not currently
-        /// supported and only JPG format is output.
+        /// Gets or sets the image format to be used when saving the image. 
         /// </summary>
         public ImageFormats ImageFormat
         {
             get
             {
-                return this._imageFormat;
+                return _imageFormat;
             }
             set
             {
-                this._imageFormat = value;
+                _imageFormat = value;
             }
         }
 
@@ -289,16 +410,70 @@ namespace ASPNetImage
         {
             get
             {
-                return this._jpegQuality;
+                return _jpegQuality;
             }
             set
             {
-                this._jpegQuality = value;
+                _jpegQuality = value;
 
-                if (this._jpegQuality > 100)
-                    this._jpegQuality = 100;
-                if (this._jpegQuality < 0)
-                    this._jpegQuality = 0;
+                if (_jpegQuality > 100)
+                {
+                    _jpegQuality = 100;
+                }
+                else if (_jpegQuality < 0)
+                {
+                    _jpegQuality = 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The MaxX property determines the X size of the image
+        /// </summary>
+        public int MaxX
+        {
+            get
+            {
+                if (_image != null)
+                {
+                    return _image.Width;
+                }
+                
+                return 0;
+            }
+            set
+            {
+                _maxX = value;
+                // create the image if dimensions are already set
+                if (_image == null && _maxX > 0 && _maxY > 0)
+                {
+                    ClearImage();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The MaxY property determines the Y size of the image
+        /// </summary>
+        public int MaxY
+        {
+            get
+            {
+                if (_image != null)
+                {
+                    return _image.Height;
+                }
+                
+                return 0;
+            }
+            set
+            {
+                _maxY = value;
+                // create the image if dimensions are already set
+                if (_image == null && _maxX > 0 && _maxY > 0)
+                {
+                    ClearImage();
+                }
             }
         }
 
@@ -310,23 +485,106 @@ namespace ASPNetImage
         {
             get
             {
-                return this._progressiveJPEGEncoding;
+                return _progressiveJPEGEncoding;
             }
             set
             {
-                this._progressiveJPEGEncoding = value;
+                _progressiveJPEGEncoding = value;
             }
         }
 
         /// <summary>
-        /// Returns the raw binary data for the image.  Not currently implemented. 
+        /// Returns the raw binary data for the image.
         /// Replaces "Image" property in original component.
         /// </summary>
         public byte[] Image
         {
             get
             {
-                return new byte[] { };
+                var ms = new MemoryStream();
+                switch (ImageFormat)
+                {
+                    case ImageFormats.BMP:
+                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                        break;
+                    case ImageFormats.GIF:
+                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Gif);
+                        break;
+                    case ImageFormats.PNG:
+                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        break;
+                    case ImageFormats.JPEG:
+                    default:
+                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        break;
+                }
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Pen color RGB
+        /// </summary>
+        public int PenColor
+        {
+            get
+            {
+                return _penColor;
+            }
+            set
+            {
+                _penColor = value;
+            }
+        }
+
+        /// <summary>
+        /// PenStyle 
+        /// Style determines the style in which the pen draws lines.
+        /// Value	Type	Description
+        /// 0	Solid	A solid line.
+        /// 1	Dash	A line made up of a series of dashes.
+        /// 2 	Dot	A line made up of a series of dots.
+        /// 3	DashDot	A line made up of alternating dashes and dots.
+        /// 4	DashDotDot	A line made up of a serious of dash-dot-dot combinations.
+        /// </summary>
+        public int PenStyle
+        {
+            get
+            {
+                return _penStyle;
+            }
+            set
+            {
+                if (value >= 0 && value <= 4)
+                {
+                    _penStyle = value;
+                }
+                else
+                {
+                    _penStyle = 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// PenWidth specifies the maximum width of the pen in pixels.
+        /// Example:
+        /// Image.PenWidth = 2
+        /// </summary>
+        public int PenWidth
+        {
+            get
+            {
+                return _penWidth;
+            }
+            set
+            {
+                _penWidth = value;
+
+                if (_penWidth < 1)
+                {
+                    _penWidth = 1;
+                }
             }
         }
 
@@ -337,12 +595,36 @@ namespace ASPNetImage
         {
             get
             {
-                return this._registeredTo;
+                return _registeredTo;
             }
             set
             {
-                this._registeredTo = value.Trim();
+                _registeredTo = value.Trim();
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the text angle
+        /// </summary>
+        public Single TextAngle
+        { 
+            get 
+            { 
+                return _textAngle; 
+            }
+            set
+            {
+                _textAngle = value;
+
+                if (_textAngle < 0)
+                {
+                    _textAngle = 0;
+                }
+                else if (_textAngle > 360)
+                {
+                    _textAngle = 360;
+                }
+        } 
         }
 
         /// <summary>
@@ -353,6 +635,83 @@ namespace ASPNetImage
             get
             {
                 return "2.3.1.0 (ASPNetImage v0.2)";
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the current X coordinate of the pen
+        /// </summary>
+        public Int32 X
+        {
+            get
+            {
+                return _x;
+            }
+            set
+            {
+                _x = value;
+
+                if (value > MaxX)
+                {
+                    _x = MaxX;
+                }
+                else if (_x < 0)
+                {
+                    _x = 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the current Y coordinate of the pen
+        /// </summary>
+        public Int32 Y
+        {
+            get
+            {
+                return _y;
+            }
+            set
+            {
+                _y = value;
+
+                if (_y > MaxY)
+                {
+                    _y = MaxY;
+                }
+                else if (_y < 0)
+                {
+                    _y = 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set DPI
+        /// </summary>
+        public int DPI
+        {
+            get
+            {
+                return _dpi;
+            }
+            set
+            {
+                _dpi = value;
+
+                if (_image == null)
+                {
+                    ClearImage();
+                }
+
+                var tempImage = new Bitmap(_image);
+                tempImage.SetResolution(value, value);
+                if (Math.Abs(tempImage.HorizontalResolution - tempImage.VerticalResolution) <= 0.0)
+                {
+                    _dpi = Convert.ToInt32(tempImage.HorizontalResolution);
+                    _image.Dispose();
+                    _image = tempImage;
+                }
             }
         }
 
@@ -369,20 +728,21 @@ namespace ASPNetImage
         private static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             int j;
-            ImageCodecInfo[] encoders;
-            encoders = ImageCodecInfo.GetImageEncoders();
+            ImageCodecInfo[] encoders = ImageCodecInfo.GetImageEncoders();
+
             for (j = 0; j < encoders.Length; ++j)
             {
                 if (encoders[j].MimeType == mimeType)
                     return encoders[j];
             }
+
             return null;
         }
 
         /// <summary>
         /// Adjusts the brightness of the image from -255 (full black) to 255 (full white)
         /// </summary>
-        /// <param name="percentage"></param>
+        /// <param name="adjustmentValue"></param>
         private void AdjustBrightness(float adjustmentValue)
         {
 
@@ -395,9 +755,9 @@ namespace ASPNetImage
             // Based off James Craig's ColorMatrix blog entry at:
             // http://www.gutgames.com/post/Adjusting-Brightness-of-an-Image-in-C.aspx
 
-            Bitmap tempImage = new Bitmap(this._image);
+            var tempImage = new Bitmap(_image);
             float finalValue = adjustmentValue / 255.0f;
-            Bitmap newBitmap = new Bitmap(tempImage.Width, tempImage.Height);
+            var newBitmap = new Bitmap(tempImage.Width, tempImage.Height);
             Graphics newGraphics = Graphics.FromImage(newBitmap);
 
             float[][] floatColorMatrix = {
@@ -407,20 +767,84 @@ namespace ASPNetImage
                     new float[] {0, 0, 0, 1, 0},
                     new float[] {finalValue, finalValue, finalValue, 1, 1}
                 };
-            ColorMatrix newColorMatrix = new ColorMatrix(floatColorMatrix);
-            ImageAttributes attributes = new ImageAttributes();
-            attributes.SetColorMatrix(newColorMatrix);
+            var colorMtrx = new ColorMatrix(floatColorMatrix);
+            var imageAttr = new ImageAttributes();
+            imageAttr.SetColorMatrix(colorMtrx);
 
-            newGraphics.DrawImage(tempImage, new Rectangle(0, 0, tempImage.Width, tempImage.Height), 0, 0, tempImage.Width, tempImage.Height, GraphicsUnit.Pixel, attributes);
+            newGraphics.DrawImage(tempImage, new Rectangle(0, 0, tempImage.Width, tempImage.Height), 0, 0, tempImage.Width, tempImage.Height, GraphicsUnit.Pixel, imageAttr);
 
             // Get rid of the old image data first
-            this._image.Dispose();
-            this._image = newBitmap;
+            _image.Dispose();
+            _image = newBitmap;
 
             // Cleanup
-            attributes.Dispose();
+            imageAttr.Dispose();
             newGraphics.Dispose();
         }
+
+        /// <summary>
+        /// Converte un byte array in una System.Drawing.Image
+        /// </summary>
+        /// <param name="imageIn"></param>
+        /// <param name="imgFormat"></param>
+        /// <returns></returns>
+        private byte[] ImageToByteArray(Image imageIn, ImageFormat imgFormat)
+        {
+            var ms = new MemoryStream();
+            imageIn.Save(ms, imgFormat);
+            return ms.ToArray();
+        }
+
+        /// <summary>
+        /// Converte una System.Drawing.Image in un byte array
+        /// </summary>
+        /// <param name="byteArrayIn"></param>
+        /// <returns></returns>
+        private Image ByteArrayToImage(byte[] byteArrayIn)
+        {
+            var ms = new MemoryStream(byteArrayIn);
+            Image returnImage = System.Drawing.Image.FromStream(ms);
+            return returnImage;
+        }
+
+        /// <summary>
+        ///Devo fare questo giro perché a volte l'immagine ha un formato particolare e quindi va in eccezione
+        ///Eccezione: "Impossibile creare un oggetto Graphics da un'immagine con formato a pixel indicizzato"
+        /// </summary>
+        /// <param name="image">immagine</param>
+        /// <param name="tipo">estensione dell'immagine</param>
+        /// <returns></returns>
+        private Graphics GetGraphicsImage(Image image, string tipo)
+        {
+            Graphics gra;
+
+            try
+            {
+                gra = Graphics.FromImage(image);
+            }
+            catch (Exception)
+            {
+                var ms = new MemoryStream();
+                switch (tipo.ToLower())
+                {
+                    case "gif":
+                        image.Save(ms, System.Drawing.Imaging.ImageFormat.Gif);
+                        break;
+                    case "png":
+                        image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        break;
+                    default:
+                        image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        break;
+                }
+
+                Image img = System.Drawing.Image.FromStream(ms);
+                gra = Graphics.FromImage(img);
+            }
+
+            return gra;
+        }
+
 
         #endregion
 
@@ -435,11 +859,6 @@ namespace ASPNetImage
         }
 
         public bool AddFont(string strFontFileName)
-        {
-            return false;
-        }
-
-        public bool AddImage(string strFileName, int intX, int intY)
         {
             return false;
         }
@@ -477,15 +896,7 @@ namespace ASPNetImage
         {
         }
 
-        public void Contrast(int intDegree)
-        {
-        }
-
         public void CreateBlackWhite()
-        {
-        }
-
-        public void CreateGrayScale()
         {
         }
 
@@ -493,15 +904,7 @@ namespace ASPNetImage
         {
         }
 
-        public void CreateNegative()
-        {
-        }
-
         public void DoMerge(string strFileName, int intPercent)
-        {
-        }
-
-        public void Emboss()
         {
         }
 
@@ -529,16 +932,11 @@ namespace ASPNetImage
         {
         }
 
-        public int GetPixel(int intX, int intY)
-        {
-            return 0;
-        }
-
         public void GradientOneWay(int intBeginColor, int intEndColor, int intDirection)
         {
             //Graphics graphicsDest = Graphics.FromImage(this._image);
             //LinearGradientBrush thisBrush;
-            
+
             //switch (intDirection)
             //{
             //    case 0:
@@ -554,15 +952,6 @@ namespace ASPNetImage
 
         public void GradientTwoWay(int intBeginColor, int intEndColor, int intDirection, int intInOut)
         {
-        }
-
-        public void LineTo(int intX, int intY)
-        {
-        }
-
-        public bool LoadBlob(object ovBlob, int intType)
-        {
-            return false;
         }
 
         public bool LoadTexture(string strFileName)
@@ -588,47 +977,6 @@ namespace ASPNetImage
 
         public void PolyLine(int[,] aryPoint)
         {
-        }
-
-        public void Rectangle(int intX1, int intY1, int intX2, int intY2)
-        {
-        }
-
-        /// <summary>
-        /// Resizes the image using a resampling to produce better quality. Not implemented, but calls
-        /// Resize() method.
-        /// </summary>
-        /// <param name="intWidth"></param>
-        /// <param name="intHeigh"></param>
-        public void ResizeR(int intWidth, int intHeigh)
-        {
-            this.Resize(intWidth, intHeigh);
-        }
-
-        /// <summary>
-        /// Rotates the image the specified number of degrees. Partially implemented and only
-        /// currently supports 90, 180, and 270 degree clockwise rotations.
-        /// </summary>
-        /// <param name="intDegrees"></param>
-        public void RotateImage(int intDegrees)
-        {
-            if (intDegrees == 90 || intDegrees == 180 || intDegrees == 270)
-            {
-                switch (intDegrees)
-                {
-                    case 90:
-                        this._image.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                        break;
-
-                    case 180:
-                        this._image.RotateFlip(RotateFlipType.Rotate180FlipNone);
-                        break;
-
-                    case 270:
-                        this._image.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                        break;
-                }
-            }
         }
 
         public void RoundRect(int intX1, int intY1, int intX2, int intY2, int intX3, int intY3)
@@ -660,20 +1008,6 @@ namespace ASPNetImage
         {
         }
 
-        public void TextOut(string strText, int intX, int intY, bool bol3d)
-        {
-        }
-
-        public int TextHeight(string strValue)
-        {
-            return 0;
-        }
-
-        public int TextWidth(string strValue)
-        {
-            return 0;
-        }
-
         public void TintImage(int intColor)
         {
         }
@@ -689,39 +1023,258 @@ namespace ASPNetImage
         #endregion
 
         /// <summary>
+        /// Adds a new image to the canvas using the intX and intY coordinates
+        /// <param name="strFileName"></param>
+        /// <param name="intX"></param>
+        /// <param name="intY"></param>
+        /// </summary>
+        public bool AddImage(string strFileName, int intX, int intY)
+        {
+            FileStream fileStream = null;
+            Graphics graphicsDest = Graphics.FromImage(_image);
+
+            try
+            {
+                fileStream = new FileStream(strFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                Image addedImage = System.Drawing.Image.FromStream(fileStream);
+                graphicsDest.DrawImage(addedImage, intX, intY);
+            }
+            catch (Exception e)
+            {
+                _error = e.ToString();
+            }
+            finally
+            {
+                graphicsDest.Dispose();
+                // release image file in the file system
+                if (fileStream != null)
+                {
+                    fileStream.Close();
+                    fileStream.Dispose();
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Adds a new image to the canvas using the intX and intY coordinates passing an Image
+        /// <param name="imageToAdd"></param>
+        /// <param name="intX"></param>
+        /// <param name="intY"></param>
+        /// </summary>
+        public bool AddImage(byte[] imageToAdd, int intX, int intY)
+        {
+            Graphics graphicsDest = Graphics.FromImage(_image);
+
+            try
+            {
+                graphicsDest.DrawImage(ByteArrayToImage(imageToAdd), intX, intY);
+            }
+            catch (Exception e)
+            {
+                _error = e.ToString();
+            }
+            finally
+            {
+                graphicsDest.Dispose();
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Brightens an image by the specified percentage
+        /// </summary>
+        /// <param name="percentage"></param>
+        public void BrightenImage(int percentage)
+        {
+            if (percentage <= 0)
+                percentage = 1;
+
+            if (percentage > 100)
+                percentage = 100;
+
+            AdjustBrightness(255f * ((float)percentage / 100f));
+        }
+
+        /// <summary>
         /// Clears the entire image with the current BackgroundColor
         /// </summary>
         public void ClearImage()
         {
-            Graphics graphicsDest = Graphics.FromImage(this._image);
+            Graphics graphicsDest = null;
+
+            if (_image == null)
+            {
+                if (_maxX <= 0)
+                {
+                    _maxX = 1;
+                }
+
+                if (_maxY <= 0)
+                {
+                    _maxY = 1;
+                }
+
+                var bitmapDest = new Bitmap(_maxX, _maxY);
+                _image = bitmapDest;
+            }
+
+            graphicsDest = Graphics.FromImage(_image);
             graphicsDest.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-            Color brushColor = Color.FromArgb(this.BackgroundColor);
+            Color brushColor = Color.FromArgb(BackgroundColor);
             Brush coloredBrush = new SolidBrush(brushColor);
-            graphicsDest.FillRectangle(coloredBrush, 0, 0, this._image.Width, this._image.Height);
-            graphicsDest.DrawImage(this._image, 0, 0);
+            graphicsDest.FillRectangle(coloredBrush, 0, 0, _image.Width, _image.Height);
+            graphicsDest.DrawImage(_image, 0, 0);
 
             graphicsDest.Dispose();
             coloredBrush.Dispose();
         }
 
         /// <summary>
+        /// Modifies the image contrast. intDegree should be -100 to 100
+        /// </summary>
+        /// <param name="intDegree"></param>
+        public void Contrast(int intDegree)
+        {
+            if (intDegree < -100)
+                intDegree = -100;
+            if (intDegree > 100)
+                intDegree = 100;
+            float factor = (float)Math.Pow((100.0 + intDegree) / 100.0, 2.0);
+
+            var graphicsDest = Graphics.FromImage(_image);
+            var imageAttr = new ImageAttributes();
+            var colorMtrx = new ColorMatrix(new float[][]{   new float[]{factor,0f,0f,0f,0f}, 
+                                                              new float[]{0f,factor,0f,0f,0f}, 
+                                                              new float[]{0f,0f,factor,0f,0f}, 
+                                                              new float[]{0f,0f,0f,1f,0f}, 
+                                                              new float[]{0.001f,0.001f,0.001f,0f,1f}});
+            imageAttr.SetColorMatrix(colorMtrx);
+            graphicsDest.DrawImage(_image, new Rectangle(0, 0, _image.Width, _image.Height), 0, 0, _image.Width, _image.Height, GraphicsUnit.Pixel, imageAttr);
+
+            graphicsDest.Dispose();
+            imageAttr.Dispose();
+        }
+
+        /// <summary>
+        /// Turns the current image into a Gray Scale image
+        /// </summary>
+        public void CreateGrayScale()
+        {
+            Graphics graphicsDest = Graphics.FromImage(_image);
+
+            var imageAttr = new ImageAttributes();
+            var colorMtrx = new ColorMatrix(new float[][]{   new float[]{0.299f, 0.299f, 0.299f, 0, 0}, 
+                                                              new float[]{0.587f, 0.587f, 0.587f, 0, 0}, 
+                                                              new float[]{0.114f, 0.114f, 0.114f, 0, 0}, 
+                                                              new float[]{     0,      0,      0, 1, 0}, 
+                                                              new float[]{     0,      0,      0, 0, 0}});
+
+            imageAttr.SetColorMatrix(colorMtrx);
+            graphicsDest.DrawImage(_image, new Rectangle(0, 0, _image.Width, _image.Height), 0, 0, _image.Width, _image.Height, GraphicsUnit.Pixel, imageAttr);
+
+            graphicsDest.Dispose();
+            imageAttr.Dispose();
+        }
+
+        /// <summary>
+        /// Creates a negative image effect of the current image
+        /// </summary>
+        public void CreateNegative()
+        {
+            Graphics graphicsDest = Graphics.FromImage(this._image);
+
+            var imageAttr = new ImageAttributes();
+            var colorMtrx = new ColorMatrix(new float[][]{   new float[]{-1, 0, 0, 0, 0}, 
+                                                              new float[]{0, -1, 0, 0, 0}, 
+                                                              new float[]{0, 0, -1, 0, 0}, 
+                                                              new float[]{0, 0, 0, 1, 0}, 
+                                                              new float[]{1, 1, 1, 0, 1}});
+            imageAttr.SetColorMatrix(colorMtrx);
+            graphicsDest.DrawImage(_image, new Rectangle(0, 0, _image.Width, _image.Height), 0, 0, _image.Width, _image.Height, GraphicsUnit.Pixel, imageAttr);
+
+            graphicsDest.Dispose();
+            imageAttr.Dispose();
+        }
+
+        /// <summary>
         /// Crops the image with the specified dimensions
         /// </summary>
-        /// <param name="intStartX"></param>
-        /// <param name="intStartY"></param>
-        /// <param name="intWidth"></param>
-        /// <param name="intHeight"></param>
+        /// <param name="startX"></param>
+        /// <param name="startY"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         public void CropImage(int startX, int startY, int width, int height)
         {
-            Bitmap croppedImage = new Bitmap(width, height);
+            var croppedImage = new Bitmap(width, height);
             Graphics graphicsCrop = Graphics.FromImage(croppedImage);
-            Rectangle recDest = new Rectangle(0, 0, width, height);
-            graphicsCrop.DrawImage(this._image, recDest, startX, startY, width, height, GraphicsUnit.Pixel);
+            graphicsCrop.Clear(Color.FromArgb(BackgroundColor));
+            var recDest = new Rectangle(0, 0, width, height);
+            graphicsCrop.DrawImage(_image, recDest, startX, startY, width, height, GraphicsUnit.Pixel);
 
-            this._image.Dispose();
-            this._image = croppedImage;
+            _image.Dispose();
+            _image = croppedImage;
 
             graphicsCrop.Dispose();
+        }
+
+        /// <summary>
+        /// Darkens the image by the specified percentage
+        /// </summary>
+        /// <param name="percentage"></param>
+        public void DarkenImage(int percentage)
+        {
+            if (percentage <= 0)
+                percentage = 1;
+
+            if (percentage > 100)
+                percentage = 100;
+
+            AdjustBrightness(-(255f * ((float)percentage / 100f)));
+        }
+
+        /// <summary>
+        /// Gives the current image an embossed look
+        /// </summary>
+        public void Emboss()
+        {
+            Graphics graphicsDest = Graphics.FromImage(_image);
+            var imgTemp = new Bitmap(_image);
+            imgTemp.SetResolution(_image.HorizontalResolution, _image.VerticalResolution);
+            var rect = new Rectangle(0, 0, imgTemp.Width, imgTemp.Height);
+            BitmapData bmpData = imgTemp.LockBits(rect, ImageLockMode.ReadWrite, _image.PixelFormat);
+            IntPtr ptr = bmpData.Scan0;
+            int numBytes = imgTemp.Width * imgTemp.Height * 3;
+            int rowLenght = imgTemp.Width * 3;
+            var rgbValues = new byte[numBytes];
+            Marshal.Copy(ptr, rgbValues, 0, numBytes);
+
+            for (int i = 0; i < rgbValues.Length; i += 3)
+            {
+                if (i < rgbValues.Length - rowLenght - 3)
+                {
+                    byte b = (byte)(rgbValues[i] - rgbValues[rowLenght + i + 3] + (byte)128);
+                    rgbValues[i] = (byte)Math.Min((byte)Math.Abs(b), (byte)255);
+
+                    b = (byte)(rgbValues[i + 1] - rgbValues[rowLenght + i + 4] + (byte)128);
+                    rgbValues[i + 1] = (byte)Math.Min((byte)Math.Abs(b), (byte)255);
+
+                    b = (byte)(rgbValues[i + 2] - rgbValues[rowLenght + i + 5] + (byte)128);
+                    rgbValues[i + 2] = (byte)Math.Min((byte)Math.Abs(b), (byte)255);
+                }
+                else
+                {
+                    rgbValues[i] = rgbValues[i + 1] = rgbValues[i + 2] = 128;
+                }
+            }
+
+            Marshal.Copy(rgbValues, 0, ptr, numBytes);
+            imgTemp.UnlockBits(bmpData);
+            graphicsDest.DrawImage(imgTemp, 0, 0);
+            graphicsDest.Dispose();
+            imgTemp.Dispose();
         }
 
         /// <summary>
@@ -733,12 +1286,12 @@ namespace ASPNetImage
         /// <param name="intBottom"></param>
         public void FillRect(int intLeft, int intTop, int intRight, int intBottom)
         {
-            Graphics graphicsDest = Graphics.FromImage(this._image);
+            Graphics graphicsDest = Graphics.FromImage(_image);
             graphicsDest.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-            Color brushColor = Color.FromArgb(this.PenColor);
+            Color brushColor = Color.FromArgb(PenColor);
             Brush coloredBrush = new SolidBrush(brushColor);
-            graphicsDest.FillRectangle(coloredBrush, intLeft, intTop, intRight - intLeft, intBottom - intTop);
-            graphicsDest.DrawImage(this._image, 0, 0);
+            graphicsDest.FillRectangle(coloredBrush, intLeft, intTop, intRight - intLeft + 1, intBottom - intTop + 1);
+            graphicsDest.DrawImage(_image, 0, 0);
 
             graphicsDest.Dispose();
             coloredBrush.Dispose();
@@ -747,13 +1300,17 @@ namespace ASPNetImage
         /// <summary>
         /// Flips the image vertically (intDirection == 2) or horizontally (intDirection == 1)
         /// </summary>
-        /// <param name="intDirection"></param>
+        /// <param name="direction"></param>
         public void FlipImage(FlipDirections direction)
         {
             if (direction == FlipDirections.Horizontal)
-                this._image.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            {
+                _image.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            }
             else if (direction == FlipDirections.Vertical)
-                this._image.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            {
+                _image.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            }
         }
 
         /// <summary>
@@ -767,7 +1324,7 @@ namespace ASPNetImage
             width = 0;
             height = 0;
 
-            System.Drawing.Image thisImage = System.Drawing.Image.FromFile(filePath);
+            var thisImage = System.Drawing.Image.FromFile(filePath);
 
             if (thisImage != null)
             {
@@ -788,11 +1345,168 @@ namespace ASPNetImage
             width = 0;
             height = 0;
 
-            if (this._image != null)
+            if (_image != null)
             {
-                width = this._image.Width;
-                height = this._image.Height;
+                width = _image.Width;
+                height = _image.Height;
             }
+        }
+
+        /// <summary>
+        /// Returns the color value (argb) for the pixel at the specified x and y coordinates
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public int GetPixel(int x, int y)
+        {
+            if (_image != null && x < _image.Width && y <= _image.Height)
+            {
+                return ((Bitmap)_image).GetPixel(x, y).ToArgb();
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Draws a line from the current pen coordinates to the specified destination with the current pen color and width
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void LineTo(int x, int y)
+        {
+            Graphics graphicsDest = Graphics.FromImage(_image);
+
+            var pen = new Pen(Color.FromArgb((Int32)BitConverter.GetBytes(PenColor)[2], (Int32)BitConverter.GetBytes(PenColor)[1], (Int32)BitConverter.GetBytes(PenColor)[0]))
+            {
+                Width = PenWidth,
+                DashStyle = (DashStyle)PenStyle
+            };
+
+            graphicsDest.DrawLine(pen, X, Y, x, y);
+
+            // Update pen coordinates
+            _x = x;
+            _y = y;
+        }
+
+        /// <summary>
+        /// LoadBlob is designed to allow the loading of binary image data from other AspImage objects 
+        /// (using the .Image property for ovBlob) or from other data sources where binary image data 
+        /// is available via an OLE variant pointer. ovBlob is an OLE variant pointing to raw image data. 
+        /// The raw image data is loaded onto the AspImage canvas.
+        /// The parameter intType indicates what type of format the binary data is in. Valid intTypes are:
+        ///     1: JPEG 
+        ///     2: BMP 
+        ///     3: PNG 
+        /// </summary>
+        /// <param name="ovBlob"></param>
+        /// <param name="intType"></param>
+        /// <returns></returns>
+        public bool LoadBlob(object ovBlob, int intType)
+        {
+            MemoryStream ms = null;
+            try
+            {
+                ms = new MemoryStream((byte[])ovBlob);
+                _image = System.Drawing.Image.FromStream(ms);
+
+                if (_image != null)
+                {
+                    // GIMP thumbnails specifically cause System.Net.Image.Save() to fail and must be removed
+                    // NET removes embedded thumbnails when the image is rotated, so we can easily strip them
+                    // by flipping the image once, and then back again
+                    FlipImage(FlipDirections.Horizontal);
+                    FlipImage(FlipDirections.Horizontal);
+                    if (intType == 1)
+                        ImageFormat = ImageFormats.JPEG;
+                    if (intType == 2)
+                        ImageFormat = ImageFormats.BMP;
+                    if (intType == 3)
+                        ImageFormat = ImageFormats.PNG;
+
+                    return true;
+                }
+                else
+                    _error = "Unknown error loading image";
+
+            }
+            catch (Exception e)
+            {
+                _error = e.ToString();
+            }
+            finally
+            {
+                if (ms != null)
+                {
+                    ms.Close();
+                    ms.Dispose();
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Loads image from the specified file path
+        /// </summary>
+        /// <param name="imageFilePath"></param>
+        /// <returns></returns>
+        public bool LoadImage(string imageFilePath)
+        {
+            FileStream fileStream = null;
+
+            try
+            {
+
+                // We're not using System.Drawing.Image.FromFile() here because it locks the file
+                // until the object is disposed and we may need to save and/or manipulate the
+                // raw file in the meantime.
+
+                fileStream = new FileStream(imageFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                _image = System.Drawing.Image.FromStream(fileStream);
+
+                if (_image != null)
+                {
+                    // GIMP thumbnails specifically cause System.Net.Image.Save() to fail and must be removed
+                    // NET removes embedded thumbnails when the image is rotated, so we can easily strip them
+                    // by flipping the image once, and then back again
+                    FlipImage(FlipDirections.Horizontal);
+                    FlipImage(FlipDirections.Horizontal);
+
+                    return true;
+                }
+                else
+                    _error = "Unknown error loading image";
+
+            }
+            catch (Exception e)
+            {
+                _error = e.ToString();
+            }
+            finally
+            {
+                if (fileStream != null)
+                {
+                    fileStream.Close();
+                    fileStream.Dispose();
+                }
+            }
+
+            return false;
+        }
+
+        public void Rectangle(int intX1, int intY1, int intX2, int intY2)
+        {
+            Graphics graphicsDest = GetGraphicsImage(_image, ImageFormat.ToString());
+
+            var pen = new Pen(Color.FromArgb((Int32)BitConverter.GetBytes(PenColor)[2], (Int32)BitConverter.GetBytes(PenColor)[1], (Int32)BitConverter.GetBytes(PenColor)[0]))
+            {
+                Width = PenWidth,
+                DashStyle = (DashStyle)PenStyle
+            };
+
+            graphicsDest.DrawRectangle(pen, intX1, intY1, intX2, intY2);
         }
 
         /// <summary>
@@ -803,10 +1517,10 @@ namespace ASPNetImage
         public void Resize(int width, int height)
         {
             // Don't scale and crop the original image if we don't need to.
-            if (this._image.Width != width || this._image.Height != height)
+            if (_image.Width != width || _image.Height != height)
             {
-                int originalWidth = this._image.Width;
-                int originalHeight = this._image.Height;
+                int originalWidth = _image.Width;
+                int originalHeight = _image.Height;
                 int newWidth = width;
                 int newHeight = height;
 
@@ -815,7 +1529,7 @@ namespace ASPNetImage
 
                 // Constraining the proportions of the image will resize the image
                 // maintaining the same aspect ratio and crop as needed
-                if (this.ConstrainResize)
+                if (ConstrainResize)
                 {
                     newHeight = Convert.ToInt32((originalHeight * width) / originalWidth);
 
@@ -836,10 +1550,10 @@ namespace ASPNetImage
                 {
                     resizedImage = new Bitmap(newWidth, newHeight);
                     graphicsDest = Graphics.FromImage(resizedImage);
-                    graphicsDest.DrawImage(this._image, 0, 0, newWidth + 1, newHeight + 1);
+                    graphicsDest.DrawImage(_image, 0, 0, newWidth + 1, newHeight + 1);
 
-                    this._image.Dispose();
-                    this._image = resizedImage;
+                    _image.Dispose();
+                    _image = resizedImage;
                 }
 
                 // Crop the image to the final size if necessary
@@ -849,88 +1563,66 @@ namespace ASPNetImage
                     int cropY = (newHeight == height ? 0 : Convert.ToInt32((newHeight - height) / 2));
                     int cropX = (newWidth == width ? 0 : Convert.ToInt32((newWidth - width) / 2));
 
-                    this.CropImage(cropX, cropY, width, height);
+                    CropImage(cropX, cropY, width, height);
                 }
 
-                graphicsDest.Dispose();
+                if (graphicsDest != null) graphicsDest.Dispose();
             }
         }
 
         /// <summary>
-        /// Brightens an image by the specified percentage
+        /// Resize proportionally based on width
         /// </summary>
-        /// <param name="percentage"></param>
-        public void BrightenImage(int percentage)
-        {
-            if (percentage <= 0)
-                percentage = 1;
-
-            if (percentage > 100)
-                percentage = 100;
-
-            this.AdjustBrightness(255f * ((float)percentage / 100f));
+        /// <param name="width"></param>
+        public void ResizeOnWidth(int width) {
+            int height = (int)Math.Round(((double)width / (double)this.MaxX) * (double)this.MaxY);
+            Resize(width, height);
         }
 
         /// <summary>
-        /// Darkens the image by the specified percentage
+        /// Resize proportionally based on height
         /// </summary>
-        /// <param name="intDegree"></param>
-        public void DarkenImage(int percentage)
-        {
-            if (percentage <= 0)
-                percentage = 1;
-
-            if (percentage > 100)
-                percentage = 100;
-
-            this.AdjustBrightness(-(255f * ((float)percentage / 100f)));
+        /// <param name="height"></param>
+        public void ResizeOnHeight(int height) {
+            int width = (int)Math.Round(((double)height / (double)this.MaxY) * (double)this.MaxX);
+            Resize(width, height);
         }
 
         /// <summary>
-        /// Loads image from the specified file path
+        /// Resizes the image using a resampling to produce better quality. Not implemented, but calls
+        /// Resize() method.
         /// </summary>
-        /// <param name="imageFilePath"></param>
-        /// <returns></returns>
-        public bool LoadImage(string imageFilePath)
+        /// <param name="intWidth"></param>
+        /// <param name="intHeigh"></param>
+        public void ResizeR(int intWidth, int intHeigh)
         {
-            FileStream fileStream = null;
+            Resize(intWidth, intHeigh);
+        }
 
-            try
+        /// <summary>
+        /// Rotates the image the specified number of degrees. Partially implemented and only
+        /// currently supports 90, 180, and 270 degree clockwise rotations.
+        /// </summary>
+        /// <param name="intDegrees"></param>
+        public void RotateImage(int intDegrees)
+        { //TODO: vedere se si può rotare con un grado qualsiasi
+            if (intDegrees == 90 || intDegrees == 180 || intDegrees == 270)
             {
-
-                // We're not using System.Drawing.Image.FromFile() here because it locks the file
-                // until the object is disposed and we may need to save and/or manipulate the
-                // raw file in the meantime.
-
-                fileStream = new FileStream(imageFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                this._image = System.Drawing.Image.FromStream(fileStream);
-
-                if (this._image != null)
+                switch (intDegrees)
                 {
-                    // GIMP thumbnails specifically cause System.Net.Image.Save() to fail and must be removed
-                    // NET removes embedded thumbnails when the image is rotated, so we can easily strip them
-                    // by flipping the image once, and then back again
-                    this.FlipImage(FlipDirections.Horizontal);
-                    this.FlipImage(FlipDirections.Horizontal);
+                    case 90:
+                        _image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                        break;
 
-                    return true;
+                    case 180:
+                        _image.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                        break;
+
+                    case 270:
+                        _image.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                        break;
                 }
-                else
-                    this._error = "Unknown error loading image";
-
             }
-            catch (Exception e)
-            {
-                this._error = e.ToString();
-            }
-            finally
-            {
-                if (fileStream != null)
-                    fileStream.Close();
-                fileStream.Dispose();
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -940,54 +1632,54 @@ namespace ASPNetImage
         /// <returns></returns>
         public bool SaveImage()
         {
-            if (this.Filename.Length > 0)
+            if (Filename.Length > 0)
             {
                 ImageCodecInfo imageCodecInfo;
                 Encoder imageEncoder;
                 EncoderParameter imageEncoderParameter;
                 EncoderParameters imageEncoderParameters;
 
-                switch (this.ImageFormat)
+                switch (ImageFormat)
                 {
                     case ImageFormats.BMP:
 
-                        this.Filename = Path.ChangeExtension(this.Filename, "bmp");
+                        Filename = Path.ChangeExtension(Filename, "bmp");
 
                         try
                         {
-                            this._image.Save(this.Filename, System.Drawing.Imaging.ImageFormat.Bmp);
+                            _image.Save(Filename, System.Drawing.Imaging.ImageFormat.Bmp);
                         }
                         catch (Exception e)
                         {
-                            this._error = e.ToString();
+                            _error = e.ToString();
                         }
                         break;
 
                     case ImageFormats.GIF:
 
-                        this.Filename = Path.ChangeExtension(this.Filename, "gif");
+                        Filename = Path.ChangeExtension(Filename, "gif");
 
                         try
                         {
-                            this._image.Save(this.Filename, System.Drawing.Imaging.ImageFormat.Gif);
+                            _image.Save(Filename, System.Drawing.Imaging.ImageFormat.Gif);
                         }
                         catch (Exception e)
                         {
-                            this._error = e.ToString();
+                            _error = e.ToString();
                         }
                         break;
 
                     case ImageFormats.PNG:
 
-                        this.Filename = Path.ChangeExtension(this.Filename, "png");
+                        Filename = Path.ChangeExtension(Filename, "png");
 
                         try
                         {
-                            this._image.Save(this.Filename, System.Drawing.Imaging.ImageFormat.Png);
+                            _image.Save(Filename, System.Drawing.Imaging.ImageFormat.Png);
                         }
                         catch (Exception e)
                         {
-                            this._error = e.ToString();
+                            _error = e.ToString();
                         }
 
                         break;
@@ -998,18 +1690,18 @@ namespace ASPNetImage
                         imageCodecInfo = GetEncoderInfo("image/jpeg");
                         imageEncoder = Encoder.Quality;
                         imageEncoderParameters = new EncoderParameters(1);
-                        imageEncoderParameter = new EncoderParameter(imageEncoder, this.JPEGQuality);
+                        imageEncoderParameter = new EncoderParameter(imageEncoder, JPEGQuality);
                         imageEncoderParameters.Param[0] = imageEncoderParameter;
 
-                        this.Filename = Path.ChangeExtension(this.Filename, "jpg");
+                        Filename = Path.ChangeExtension(Filename, "jpg");
 
                         try
                         {
-                            this._image.Save(this.Filename, imageCodecInfo, imageEncoderParameters);
+                            _image.Save(Filename, imageCodecInfo, imageEncoderParameters);
                         }
                         catch (Exception e)
                         {
-                            this._error = e.ToString();
+                            _error = e.ToString();
                         }
 
                         break;
@@ -1017,25 +1709,115 @@ namespace ASPNetImage
 
                 try
                 {
-                    if (File.Exists(this.Filename))
+                    if (File.Exists(Filename))
                     {
-                        if (this.AutoClear)
-                            this._image.Dispose();
+                        if (AutoClear)
+                            _image.Dispose();
 
                         return true;
                     }
-                    else
-                        this._error = "Unknown error saving image";
+                    
+                    this._error = "Unknown error saving image";
                 }
                 catch (Exception e)
                 {
-                    this._error = e.ToString();
+                    _error = e.ToString();
                 }
             }
             else
-                this._error = "Filename property not set";
+                _error = "Filename property not set";
 
             return false;
+        }
+
+        /// <summary>
+        /// Returns the text height for strValue using the current font, font size and font characteristics
+        /// </summary>
+        /// <param name="strValue"></param>
+        /// <returns></returns>
+        public int TextHeight(string strValue)
+        {
+            Graphics graphicsDest = Graphics.FromImage(_image);
+            var font = new Font(FontName, Convert.ToSingle(FontSize));
+            SizeF size = graphicsDest.MeasureString(strValue, font);
+            graphicsDest.Dispose();
+            font.Dispose();
+
+            return Convert.ToInt32(size.Height);
+        }
+
+        /// <summary>
+        /// TextOut writes a text value using the current font, color, angle and other 
+        /// characteristics to the image at the location specified by intX and intY. 
+        /// If bol3d is true then the text is rendered using a 3D look
+        /// </summary>
+        /// <param name="strText"></param>
+        /// <param name="intX"></param>
+        /// <param name="intY"></param>
+        /// <param name="bol3D"></param>
+        public void TextOut(string strText, int intX, int intY, bool bol3D)
+        {
+            Graphics graphicsDest = Graphics.FromImage(_image);
+            if (AntiAliasText)
+                graphicsDest.TextRenderingHint = TextRenderingHint.AntiAlias;
+
+            var font = new Font(FontName, Convert.ToSingle(FontSize));
+            Color color = Color.FromArgb((Int32)BitConverter.GetBytes(FontColor)[2], (Int32)BitConverter.GetBytes(FontColor)[1], (Int32)BitConverter.GetBytes(FontColor)[0]);
+            Brush brush = new SolidBrush(color);
+            if (TextAngle == 0)
+            {
+                graphicsDest.DrawString(strText, font, brush, new Point(intX, intY));
+            }
+            else 
+            {
+                // reduce angle to 0°-360° range 
+                Single angle = TextAngle;
+                if (angle > 360)
+                {
+                    while (angle > 360)
+                    {
+                        angle = angle - 360;
+                    }
+                }
+                else if (angle < 0)
+                {
+                    while (angle < 0)
+                    {
+                        angle = angle + 360;
+                    }
+                }
+                // save graphics state
+                GraphicsState state = graphicsDest.Save();
+                // clear any traformations already in progress
+                graphicsDest.ResetTransform();
+                // rotate
+                graphicsDest.RotateTransform(angle);
+                // translate origin to compensate rotation
+                graphicsDest.TranslateTransform(intX, intY, MatrixOrder.Append);
+                // write text
+                graphicsDest.DrawString(strText, font, brush, 0, 0);
+                // restore graphic state
+                graphicsDest.Restore(state);
+            }
+            graphicsDest.Dispose();
+            brush.Dispose();
+            font.Dispose();
+        }
+
+        /// <summary>
+        /// Returns the text width for strValue using the current font, font size and font characteristics
+        /// </summary>
+        /// <param name="strValue"></param>
+        /// <returns></returns>
+        public int TextWidth(string strValue)
+        {
+            Graphics graphicsDest = Graphics.FromImage(_image);
+            var font = new Font(FontName, Convert.ToSingle(FontSize));
+            SizeF size = graphicsDest.MeasureString(strValue, font);
+            graphicsDest.Dispose();
+            font.Dispose();
+
+            return Convert.ToInt32(size.Width);
         }
 
         #endregion
