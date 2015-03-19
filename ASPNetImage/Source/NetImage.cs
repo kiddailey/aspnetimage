@@ -1496,6 +1496,13 @@ namespace ASPNetImage
             return false;
         }
 
+        /// <summary>
+        /// Draws a rectangle with the coordinates of the upper-left and lower-right coordinates provided.
+        /// </summary>
+        /// <param name="intX1"></param>
+        /// <param name="intY1"></param>
+        /// <param name="intX2"></param>
+        /// <param name="intY2"></param>
         public void Rectangle(int intX1, int intY1, int intX2, int intY2)
         {
             Graphics graphicsDest = GetGraphicsImage(_image, ImageFormat.ToString());
