@@ -634,7 +634,7 @@ namespace ASPNetImage
         {
             get
             {
-                return "2.3.1.0 (ASPNetImage v0.2)";
+                return "2.3.1.0 (ASPNetImage v0.3)";
             }
         }
 
