@@ -214,6 +214,21 @@ namespace ASPNetImage
         #endregion
 
         /// <summary>
+        /// Gets or sets whether anti-aliased text is added on the image
+        /// </summary>
+        public bool AntiAliasText
+        {
+            get
+            {
+                return _antiAliasText;
+            }
+            set
+            {
+                _antiAliasText = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether the image should be disposed of from memory after
         /// a successful save to disk.
         /// </summary>
@@ -226,21 +241,6 @@ namespace ASPNetImage
             set
             {
                 _autoClear = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether anti-aliased text is added on the image
-        /// </summary>
-        public bool AntiAliasText
-        {
-            get
-            {
-                return _antiAliasText;
-            }
-            set
-            {
-                _antiAliasText = value;
             }
         }
 
@@ -291,6 +291,35 @@ namespace ASPNetImage
             set
             {
                 _constrainResize = value;
+            }
+        }
+
+        /// <summary>
+        /// Set DPI
+        /// </summary>
+        public int DPI
+        {
+            get
+            {
+                return _dpi;
+            }
+            set
+            {
+                _dpi = value;
+
+                if (_image == null)
+                {
+                    ClearImage();
+                }
+
+                var tempImage = new Bitmap(_image);
+                tempImage.SetResolution(value, value);
+                if (Math.Abs(tempImage.HorizontalResolution - tempImage.VerticalResolution) <= 0.0)
+                {
+                    _dpi = Convert.ToInt32(tempImage.HorizontalResolution);
+                    _image.Dispose();
+                    _image = tempImage;
+                }
             }
         }
 
@@ -378,13 +407,31 @@ namespace ASPNetImage
         }
 
         /// <summary>
-        /// Gets the classes .NET image instance
+        /// Returns the raw binary data for the image.
+        /// Replaces "Image" property in original component.
         /// </summary>
-        public Image RawNetImage
+        public byte[] Image
         {
             get
             {
-                return _image;
+                var ms = new MemoryStream();
+                switch (ImageFormat)
+                {
+                    case ImageFormats.BMP:
+                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                        break;
+                    case ImageFormats.GIF:
+                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Gif);
+                        break;
+                    case ImageFormats.PNG:
+                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        break;
+                    case ImageFormats.JPEG:
+                    default:
+                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        break;
+                }
+                return ms.ToArray();
             }
         }
 
@@ -478,51 +525,6 @@ namespace ASPNetImage
         }
 
         /// <summary>
-        /// Gets or sets whether progressive JPEG encoding should be used when saving
-        /// the image.  Not currently supported.
-        /// </summary>
-        public bool ProgressiveJPEGEncoding
-        {
-            get
-            {
-                return _progressiveJPEGEncoding;
-            }
-            set
-            {
-                _progressiveJPEGEncoding = value;
-            }
-        }
-
-        /// <summary>
-        /// Returns the raw binary data for the image.
-        /// Replaces "Image" property in original component.
-        /// </summary>
-        public byte[] Image
-        {
-            get
-            {
-                var ms = new MemoryStream();
-                switch (ImageFormat)
-                {
-                    case ImageFormats.BMP:
-                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-                        break;
-                    case ImageFormats.GIF:
-                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Gif);
-                        break;
-                    case ImageFormats.PNG:
-                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                        break;
-                    case ImageFormats.JPEG:
-                    default:
-                        _image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                        break;
-                }
-                return ms.ToArray();
-            }
-        }
-
-        /// <summary>
         /// Pen color RGB
         /// </summary>
         public int PenColor
@@ -585,6 +587,33 @@ namespace ASPNetImage
                 {
                     _penWidth = 1;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether progressive JPEG encoding should be used when saving
+        /// the image.  Not currently supported.
+        /// </summary>
+        public bool ProgressiveJPEGEncoding
+        {
+            get
+            {
+                return _progressiveJPEGEncoding;
+            }
+            set
+            {
+                _progressiveJPEGEncoding = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the classes .NET image instance
+        /// </summary>
+        public Image RawNetImage
+        {
+            get
+            {
+                return _image;
             }
         }
 
@@ -682,35 +711,6 @@ namespace ASPNetImage
                 else if (_y < 0)
                 {
                     _y = 0;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Set DPI
-        /// </summary>
-        public int DPI
-        {
-            get
-            {
-                return _dpi;
-            }
-            set
-            {
-                _dpi = value;
-
-                if (_image == null)
-                {
-                    ClearImage();
-                }
-
-                var tempImage = new Bitmap(_image);
-                tempImage.SetResolution(value, value);
-                if (Math.Abs(tempImage.HorizontalResolution - tempImage.VerticalResolution) <= 0.0)
-                {
-                    _dpi = Convert.ToInt32(tempImage.HorizontalResolution);
-                    _image.Dispose();
-                    _image = tempImage;
                 }
             }
         }
@@ -1496,6 +1496,13 @@ namespace ASPNetImage
             return false;
         }
 
+        /// <summary>
+        /// Draws a rectangle with the coordinates of the upper-left and lower-right coordinates provided.
+        /// </summary>
+        /// <param name="intX1"></param>
+        /// <param name="intY1"></param>
+        /// <param name="intX2"></param>
+        /// <param name="intY2"></param>
         public void Rectangle(int intX1, int intY1, int intX2, int intY2)
         {
             Graphics graphicsDest = GetGraphicsImage(_image, ImageFormat.ToString());
@@ -1571,20 +1578,20 @@ namespace ASPNetImage
         }
 
         /// <summary>
-        /// Resize proportionally based on width
-        /// </summary>
-        /// <param name="width"></param>
-        public void ResizeOnWidth(int width) {
-            int height = (int)Math.Round(((double)width / (double)this.MaxX) * (double)this.MaxY);
-            Resize(width, height);
-        }
-
-        /// <summary>
         /// Resize proportionally based on height
         /// </summary>
         /// <param name="height"></param>
         public void ResizeOnHeight(int height) {
             int width = (int)Math.Round(((double)height / (double)this.MaxY) * (double)this.MaxX);
+            Resize(width, height);
+        }
+
+        /// <summary>
+        /// Resize proportionally based on width
+        /// </summary>
+        /// <param name="width"></param>
+        public void ResizeOnWidth(int width) {
+            int height = (int)Math.Round(((double)width / (double)this.MaxX) * (double)this.MaxY);
             Resize(width, height);
         }
 
