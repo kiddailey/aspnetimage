@@ -129,7 +129,7 @@ ASPNetImage is a work in progress and any help completing the object is apprecia
 
 * Visual Studio 2010 or greater
 
-* Install and configure NUnit.  TestDriven.NET, which provides NUnit is available at http://testdriven.net/  You will need to add a reference to "nunit.framework" in the UnitTests project.
+* Install and configure NUnit.  TestDriven.NET, which provides NUnit is available at http://testdriven.net/  You will need to add a reference to "nunit.framework.dll" in the UnitTests project.
 
 * Configure DLL signing.  In Visual Studio, open the ASPNetImage project properties and click on the "Signing" tab.  Check the box labeled "Sign the assembly" and select "< New >" from the "Choose a strong name key file:" dropdown and follow the prompts.
 
