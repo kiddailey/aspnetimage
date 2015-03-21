@@ -9,6 +9,42 @@ The ASPNetImage component essentially exposes part of the System.Drawing namespa
 A debug and release build of the DLL is included in the repository, or you can compile it yourself after generating a signing key.  Checkout a working copy of the source repository or you may download the current release in the Downloads section.
 
 
+# Environment Configuration
+
+* Visual Studio 2010 or greater
+
+* Install and configure NUnit.  TestDriven.NET, which provides NUnit is available at http://testdriven.net/  You will need to add a reference to "nunit.framework.dll" in the UnitTests project.
+
+* Configure DLL signing.  In Visual Studio, open the ASPNetImage project properties and click on the "Signing" tab.  Check the box labeled "Sign the assembly" and select "< New >" from the "Choose a strong name key file:" dropdown and follow the prompts.
+
+* You should be able to build the DLL and run the unit tests at this point.
+
+
+# Troubleshooting
+
+**Installation Issues**
+
+* Verify that the .NET Framework v2.0 is installed and working properly.
+
+* Ensure that you've registered the DLL with REGASM.EXE with the /tlb and /codebase command line switches (see the included register.bat file).  You may want to unregister the DLL and re-register them to confirm.
+
+* Make sure the DLL and TLB files have the correct file permissions.  Give read/write/execute access to NETWORK, NETWORK_SERVICE and the IUSER_[machineName] accounts.
+
+* If you are using an unsigned DLL, you will receive the following error message when registering the DLL with REGASM.EXE:
+
+  > RegAsm : warning RA0000 : Registering an unsigned assembly with /codebase can cause your assembly to interfere with other applications that may be installed on the same computer. The /codebase switch is intended to be used only with signed assemblies. Please give your assembly a strong name and re-register it.""
+
+  The object should still work, but I'd recommend unregistering it, compiling and signing the DLL yourself before registering it again so that you don't receive the warning message. Visual Studio 2005 and up can do this automatically from the Project Properties panel on the "Signing" tab. Just pick "< New >" and follow the prompts.
+
+**Other**
+
+* As of this writing, the precompiled DLL is only provided in 32bit format. There may be unknown issues running this on a 64bit OS.  Precompiled 64bit variations are planned for sometime in the future.
+
+* Some image format variations have been known to cause issues. Try alternate images from a different source.  If you experience issues loading certain images and not others, please provide the problem image(s) if possible along with a bug report.
+
+
+
+
 # Properties and Methods
 ASPNetImage is a work in progress and any help completing the object is appreciated. All properties and methods are stubbed out, but as of this writing, currently only a small subset of properties and methods are implemented either in part or whole.
 
@@ -123,37 +159,3 @@ ASPNetImage is a work in progress and any help completing the object is apprecia
   * *TextOut*<br />Writes a string of text using the current font, font size and font characteristics.
   
   * *TextWidth*<br />Returns the text width for a string value using the current font, font size and font characteristics.
-
-
-# Environment Configuration
-
-* Visual Studio 2010 or greater
-
-* Install and configure NUnit.  TestDriven.NET, which provides NUnit is available at http://testdriven.net/  You will need to add a reference to "nunit.framework.dll" in the UnitTests project.
-
-* Configure DLL signing.  In Visual Studio, open the ASPNetImage project properties and click on the "Signing" tab.  Check the box labeled "Sign the assembly" and select "< New >" from the "Choose a strong name key file:" dropdown and follow the prompts.
-
-* You should be able to build the DLL and run the unit tests at this point.
-
-
-# Troubleshooting
-
-**Installation Issues**
-
-* Verify that the .NET Framework v2.0 is installed and working properly.
-
-* Ensure that you've registered the DLL with REGASM.EXE with the /tlb and /codebase command line switches (see the included register.bat file).  You may want to unregister the DLL and re-register them to confirm.
-
-* Make sure the DLL and TLB files have the correct file permissions.  Give read/write/execute access to NETWORK, NETWORK_SERVICE and the IUSER_[machineName] accounts.
-
-* If you are using an unsigned DLL, you will receive the following error message when registering the DLL with REGASM.EXE:
-
-  > RegAsm : warning RA0000 : Registering an unsigned assembly with /codebase can cause your assembly to interfere with other applications that may be installed on the same computer. The /codebase switch is intended to be used only with signed assemblies. Please give your assembly a strong name and re-register it.""
-
-  The object should still work, but I'd recommend unregistering it, compiling and signing the DLL yourself before registering it again so that you don't receive the warning message. Visual Studio 2005 and up can do this automatically from the Project Properties panel on the "Signing" tab. Just pick "< New >" and follow the prompts.
-
-**Other**
-
-* As of this writing, the precompiled DLL is only provided in 32bit format. There may be unknown issues running this on a 64bit OS.  Precompiled 64bit variations are planned for sometime in the future.
-
-* Some image format variations have been known to cause issues. Try alternate images from a different source.  If you experience issues loading certain images and not others, please provide the problem image(s) if possible along with a bug report.
