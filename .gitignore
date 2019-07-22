@@ -2,4 +2,5 @@
 *.user
 *.vsmdi
 *.testsettings
-*.suo
+/.vs/
+/UnitTests/Connected Services/
