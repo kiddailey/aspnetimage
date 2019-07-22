@@ -41,10 +41,10 @@ namespace UnitTests
         public void TestPropertyBackgroundColor()
         {
             var thisImage = new NetImage();
-            var testValue = System.Drawing.Color.FromArgb(255, 0, 255, 255).ToArgb(); // Solid Cyan
-            thisImage.BackgroundColor = System.Drawing.Color.FromArgb(127, 0, 255, 255).ToArgb(); // Try setting it to 50% transparent cyan
+            var testValue = 0xFFFF00FF; // Solid Cyan
+            thisImage.BackgroundColor = 0x7FFF00FF; // Try setting it to 50% transparent cyan
 
-            Assert.AreEqual(testValue, thisImage.BackgroundColor);
+            Assert.AreEqual(testValue & 0x00FFFFFF, thisImage.BackgroundColor);
         }
 
         [Test]
@@ -90,9 +90,9 @@ namespace UnitTests
         {
             var thisImage = new NetImage();
             const int testValue = -8421505; //System.Drawing.Color.FromArgb(255, 127, 127, 127).ToArgb();
-            thisImage.FontColor = System.Drawing.Color.FromArgb(255, 127, 127, 127).ToArgb();
+            thisImage.FontColor = NetImage.DotNETARGBToVBScriptRGB(System.Drawing.Color.FromArgb(255, 127, 127, 127).ToArgb());
 
-            Assert.AreEqual(testValue, thisImage.FontColor);
+            Assert.AreEqual(testValue, NetImage.VBScriptRGBToDotNETARGB(thisImage.FontColor));
         }
 
         [Test]
@@ -225,9 +225,10 @@ namespace UnitTests
         [Test]
         public void TestPropertyPenColor()
         {
-            var thisImage = new NetImage { PenColor = System.Drawing.Color.FromArgb(50, 255, 0, 0).ToArgb() };
+            var penColor = 0xFFFE10;
+            var thisImage = new NetImage { PenColor = penColor };
 
-            Assert.AreEqual(System.Drawing.Color.FromArgb(50, 255, 0, 0).ToArgb(), thisImage.PenColor);
+            Assert.AreEqual(penColor, thisImage.PenColor);
         }
 
         [Test]
@@ -515,7 +516,7 @@ namespace UnitTests
             thisImage.LoadImage("../../Resources/1024x768-white.png");
             thisImage.ImageFormat = NetImage.ImageFormats.PNG;
             thisImage.Filename = outputFilePath;
-            thisImage.PenColor = Color.Red.ToArgb();
+            thisImage.BackgroundColor = NetImage.DotNETARGBToVBScriptRGB(Color.Red.ToArgb());
             thisImage.FillRect(10, 10, 20, 20);
             thisImage.AutoClear = false; // Don't clear on save so we can still access raw image
             thisImage.SaveImage();
@@ -597,21 +598,21 @@ namespace UnitTests
             Assert.AreEqual(0, pixelColor);
 
             // Initialize image
-            thisImage.BackgroundColor = System.Drawing.Color.FromArgb(50, 255, 0, 0).ToArgb();
+            thisImage.BackgroundColor = NetImage.DotNETARGBToVBScriptRGB(0x32FF0000);
             thisImage.MaxX = 1024;
             thisImage.MaxY = 768;
 
             pixelColor = thisImage.GetPixel(640, 480);
 
             // Backgrounds can only be solid colors
-            Assert.AreEqual(System.Drawing.Color.FromArgb(255, 255, 0, 0).ToArgb(), pixelColor);
+            Assert.AreEqual(System.Drawing.Color.FromArgb(255, 255, 0, 0).ToArgb(), NetImage.VBScriptRGBToDotNETARGB(pixelColor));
 
             // Verify color change
-            thisImage.BackgroundColor = System.Drawing.Color.FromArgb(50, 0, 0, 255).ToArgb();
+            thisImage.BackgroundColor = NetImage.DotNETARGBToVBScriptRGB(System.Drawing.Color.FromArgb(50, 0, 0, 255).ToArgb());
             thisImage.ClearImage();
             pixelColor = thisImage.GetPixel(640, 480);
 
-            Assert.AreEqual(System.Drawing.Color.FromArgb(255, 0, 0, 255).ToArgb(), pixelColor);
+            Assert.AreEqual(System.Drawing.Color.FromArgb(255, 0, 0, 255).ToArgb(), NetImage.VBScriptRGBToDotNETARGB(pixelColor));
         }
 
         [Test]
@@ -622,7 +623,7 @@ namespace UnitTests
             var blueColor = System.Drawing.Color.FromArgb(255, 0, 0, 255).ToArgb();
 
             var thisImage = new NetImage();
-            thisImage.BackgroundColor = System.Drawing.Color.FromArgb(255, 255, 255, 255).ToArgb();
+            thisImage.BackgroundColor = NetImage.DotNETARGBToVBScriptRGB(System.Drawing.Color.FromArgb(255, 255, 255, 255).ToArgb());
             thisImage.MaxX = 1024;
             thisImage.MaxY = 1024;
             thisImage.Filename = outputFilePath;
@@ -631,11 +632,11 @@ namespace UnitTests
 
             thisImage.X = 0;
             thisImage.Y = 0;
-            thisImage.PenColor = redColor;
+            thisImage.PenColor = NetImage.DotNETARGBToVBScriptRGB(redColor);
             thisImage.PenWidth = 1;
 
             thisImage.LineTo(1023, 1023);
-            thisImage.PenColor = blueColor;
+            thisImage.PenColor = NetImage.DotNETARGBToVBScriptRGB(blueColor);
             thisImage.LineTo(1023, 0);
 
             thisImage.SaveImage();
@@ -643,13 +644,13 @@ namespace UnitTests
             // Verify diagonal pixels
             for (int x = 0; x <= 1022; x++) // Only to 1022 because blue line covers up bottom right pixel
             {
-                Assert.AreEqual(redColor, thisImage.GetPixel(x, x));
+                Assert.AreEqual(redColor, NetImage.VBScriptRGBToDotNETARGB(thisImage.GetPixel(x, x)));
             }
 
             // Verify vertical pixels
             for (int y = 0; y <= 1023; y++)
             {
-                Assert.AreEqual(blueColor, thisImage.GetPixel(1023, y));
+                Assert.AreEqual(blueColor, NetImage.VBScriptRGBToDotNETARGB(thisImage.GetPixel(1023, y)));
             }
 
         }
@@ -855,6 +856,15 @@ namespace UnitTests
 
         // ====================================================================
         #region Miscellaneous Tests
+
+        [Test]
+        public void TestCreateCOM()
+        {
+            var type = Type.GetTypeFromProgID("AspNetImage.NetImage");
+            Assert.AreNotEqual(null, type, "type is null");
+            var obj = Activator.CreateInstance(type);
+            Assert.AreNotEqual(null, obj, "obj is null");
+        }
 
         [Test]
         public void TestGIMPImage()
