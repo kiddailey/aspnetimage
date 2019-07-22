@@ -76,6 +76,7 @@ namespace ASPNetImage
             }
             catch
             {
+                // Don't want exceptions escaping destructor method
             }
         }
 
@@ -84,14 +85,14 @@ namespace ASPNetImage
         // ====================================================================
         #region Public Enumerations
 
-        public enum BlobTypes : int
+        public enum BlobTypes
         {
             JPEG = 1,
             BMP = 2,
             PNG = 3
         }
 
-        public enum BrushStyles : int
+        public enum BrushStyles
         {
             Solid = 0,
             Clear = 1,
@@ -103,19 +104,19 @@ namespace ASPNetImage
             DiagCross = 7
         }
 
-        public enum FillStyles : int
+        public enum FillStyles
         {
             Surface = 0,
             Border = 1
         }
 
-        public enum FlipDirections : int
+        public enum FlipDirections
         {
             Horizontal = 1,
             Vertical = 2
         }
 
-        public enum GradientDirections : int
+        public enum GradientDirections
         {
             Up = 0,
             Down = 1,
@@ -123,7 +124,7 @@ namespace ASPNetImage
             Right = 3
         }
 
-        public enum ImageFormats : int
+        public enum ImageFormats
         {
             JPEG = 1,
             BMP = 2,
@@ -145,14 +146,14 @@ namespace ASPNetImage
             //InsideFrame = 6
         }
 
-        public enum PixelFormats : int
+        public enum PixelFormats
         {
             FourBit = 2,
             EightBit = 3,
             TwentyFourBit = 6
         }
 
-        public enum TextAlignments : int
+        public enum TextAlignments
         {
             Left = 0,
             Right = 2,
@@ -1029,8 +1030,6 @@ namespace ASPNetImage
         /// </summary>
         public void ClearImage()
         {
-            Graphics graphicsDest = null;
-
             if (_image == null)
             {
                 if (_maxX <= 0)
@@ -1047,9 +1046,9 @@ namespace ASPNetImage
                 _image = bitmapDest;
             }
 
-            using (graphicsDest = Graphics.FromImage(_image))
+            using (var graphicsDest = Graphics.FromImage(_image))
             {
-                graphicsDest.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                graphicsDest.CompositingMode = CompositingMode.SourceCopy;
                 var brushColor = Color.FromArgb(_backgroundColor);
                 using (Brush coloredBrush = new SolidBrush(brushColor))
                 {
@@ -1240,7 +1239,7 @@ namespace ASPNetImage
         {
             using (Graphics graphicsDest = Graphics.FromImage(_image))
             {
-                graphicsDest.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                graphicsDest.CompositingMode = CompositingMode.SourceCopy;
                 Color brushColor = Color.FromArgb(_backgroundColor);
                 using (Brush coloredBrush = new SolidBrush(brushColor))
                 {
@@ -1281,11 +1280,8 @@ namespace ASPNetImage
             using (var thisImage = System.Drawing.Image.FromFile(filePath))
             {
 
-                if (thisImage != null)
-                {
-                    width = thisImage.Width;
-                    height = thisImage.Height;
-                }
+                width = thisImage.Width;
+                height = thisImage.Height;
             }
         }
 
@@ -1697,7 +1693,7 @@ namespace ASPNetImage
                         return true;
                     }
                     
-                    this._error = "Unknown error saving image";
+                    _error = "Unknown error saving image";
                 }
                 catch (Exception e)
                 {
