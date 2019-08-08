@@ -40,7 +40,7 @@ namespace ASPNetImage
             _penStyle = 0;
             _penColor = 0;
             _textAngle = 0;
-            _brushColor = 0;
+            _brushColor = Color.FromArgb(0, 0, 0, 0).ToArgb();
             _registeredTo = "Open Source";
             _maxY = 0;
             _maxX = 0;
@@ -53,7 +53,7 @@ namespace ASPNetImage
             _filename = "";
             _error = "";
             ConstrainResize = true;
-            _backgroundColor = Color.FromArgb(255, 0, 0, 0).ToArgb(); // Default to black
+            _backgroundColor = Color.FromArgb(255, 255, 255, 255).ToArgb(); // Default to white
             Bold = false;
             AutoClear = true;
             AntiAliasText = false;
@@ -804,7 +804,7 @@ namespace ASPNetImage
                         Width = PenWidth,
                         DashStyle = (DashStyle) PenStyle
                     };
-                    var rect = new Rectangle(intX1, intY1, intX2 - intX1 + 1, intY2 - intY1 + 1);
+                    var rect = new Rectangle(intX1, intY1, intX2 - intX1 - 1, intY2 - intY1 - 1);
                     graphics.DrawEllipse(pen, rect);
                     graphics.FillEllipse(coloredBrush, rect);
                 }
